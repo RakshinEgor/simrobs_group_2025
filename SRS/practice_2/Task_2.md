@@ -2,7 +2,9 @@
 
 3. Compose the ODE from the mass spring damper system using variants below:
 
-<img width="651" height="599" alt="image" src="https://github.com/user-attachments/assets/715d3c7a-7764-497d-b4ca-d71293accd90" />
+<img src="https://github.com/user-attachments/assets/715d3c7a-7764-497d-b4ca-d71293accd90" 
+     alt="image" 
+     width="400" />
 
 Use method described in ```SRS/lecture_1/lecture_1.pdf```.
 
