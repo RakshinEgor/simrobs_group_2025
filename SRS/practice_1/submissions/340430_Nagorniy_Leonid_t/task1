@@ -1,0 +1,140 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+a, b, c, d = 2.26, 2.09, 1.99, 6.46
+
+# --- Определение системы ---
+def ode_linear_rhs(state):
+    x, v = state
+    return np.array([v, (d - b*v - c*x)/a])
+
+# --- Аналитическое решение ---
+def analytical_solution_lin(t, x0, v0, a, b, c, d):
+    t = np.asarray(t)
+    xp = d / c
+    disc = b*b - 4*a*c
+
+    if disc > 1e-12:
+        r1 = (-b - np.sqrt(disc)) / (2*a)
+        r2 = (-b + np.sqrt(disc)) / (2*a)
+        y0 = x0 - xp
+        C1 = (y0*r2 - v0) / (r2 - r1)
+        C2 = (v0 - y0*r1) / (r2 - r1)
+        e1 = np.exp(r1*t); e2 = np.exp(r2*t)
+        x = xp + C1*e1 + C2*e2
+        v = C1*r1*e1 + C2*r2*e2
+        return x, v
+
+    elif abs(disc) <= 1e-12:
+        r = -b / (2*a)
+        y0 = x0 - xp
+        C1 = y0
+        C2 = v0 - r*C1
+        e = np.exp(r*t)
+        x = xp + (C1 + C2*t)*e
+        v = (C2 + r*(C1 + C2*t))*e
+        return x, v
+
+    else:
+        alpha = -b/(2*a)
+        beta = np.sqrt(-disc)/(2*a)
+        y0 = x0 - xp
+        A = y0
+        B = (v0 - alpha*A)/beta
+        e = np.exp(alpha*t)
+        cb = np.cos(beta*t); sb = np.sin(beta*t)
+        x = xp + e*(A*cb + B*sb)
+        v = e*((alpha*A + beta*B)*cb + (alpha*B - beta*A)*sb)
+        return x, v
+
+# --- Численные методы ---
+def forward_euler(f, x0, Tf, h):
+    t = np.arange(0, Tf+h, h)
+    x_hist = np.zeros((len(x0), len(t)))
+    x = x0.copy()
+    for i, ti in enumerate(t):
+        x_hist[:, i] = x
+        x = x + h * f(x)
+    return x_hist, t
+
+def backward_euler(f, x0, Tf, h):
+    t = np.arange(0, Tf+h, h)
+    x_hist = np.zeros((len(x0), len(t)))
+    x = x0.copy()
+    for i, ti in enumerate(t):
+        x_hist[:, i] = x
+        # итерация Ньютона (1 шаг)
+        for _ in range(3):
+            fx = f(x)
+            x = x0 + h * fx
+        x0 = x
+    return x_hist, t
+
+def runge_kutta4(f, x0, Tf, h):
+    t = np.arange(0, Tf+h, h)
+    x_hist = np.zeros((len(x0), len(t)))
+    x = x0.copy()
+    for i, ti in enumerate(t):
+        x_hist[:, i] = x
+        k1 = f(x)
+        k2 = f(x + h*k1/2)
+        k3 = f(x + h*k2/2)
+        k4 = f(x + h*k3)
+        x = x + h*(k1 + 2*k2 + 2*k3 + k4)/6
+    return x_hist, t
+
+# --- Основная часть ---
+x0 = np.array([0.1, 0.0])
+Tf, h = 5.0, 0.01
+
+x_fe, t = forward_euler(ode_linear_rhs, x0, Tf, h)
+x_be, _  = backward_euler(ode_linear_rhs, x0, Tf, h)
+x_rk4, _ = runge_kutta4(ode_linear_rhs, x0, Tf, h)
+
+x_a, v_a = analytical_solution_lin(t, x0[0], x0[1], a, b, c, d)
+
+# --- Подсчёт ошибок ---
+def err_stats(x_hist, x_a, v_a):
+    ex = np.abs(x_hist[0,:] - x_a)
+    ev = np.abs(x_hist[1,:] - v_a)
+    return {
+        "max|x-x*|": np.max(ex),
+        "max|v-v*|": np.max(ev),
+        "L2(x)": np.sqrt(np.mean(ex**2)),
+        "L2(v)": np.sqrt(np.mean(ev**2)),
+    }
+
+errs = {
+    "Forward Euler": err_stats(x_fe, x_a, v_a),
+    "Backward Euler": err_stats(x_be, x_a, v_a),
+    "RK4":           err_stats(x_rk4, x_a, v_a),
+}
+
+display(pd.DataFrame(errs).T)
+
+# --- Графики ---
+plt.figure(figsize=(10,5))
+plt.plot(t, x_fe[0,:], label="Forward Euler")
+plt.plot(t, x_be[0,:], label="Backward Euler")
+plt.plot(t, x_rk4[0,:], label="RK4")
+plt.plot(t, x_a, "--", label="Analytical")
+plt.xlabel("t"); plt.ylabel("x(t)")
+plt.legend(); plt.grid(True); plt.show()
+
+plt.figure(figsize=(10,5))
+plt.plot(t, x_fe[1,:], label="Forward Euler")
+plt.plot(t, x_be[1,:], label="Backward Euler")
+plt.plot(t, x_rk4[1,:], label="RK4")
+plt.plot(t, v_a, "--", label="Analytical")
+plt.xlabel("t"); plt.ylabel("v(t)")
+plt.legend(); plt.grid(True); plt.show()
+
+plt.figure(figsize=(6,6))
+plt.plot(x_fe[0,:], x_fe[1,:], label="Forward Euler")
+plt.plot(x_be[0,:], x_be[1,:], label="Backward Euler")
+plt.plot(x_rk4[0,:], x_rk4[1,:], label="RK4")
+plt.plot(x_a, v_a, "--", label="Analytical")
+plt.xlabel("x"); plt.ylabel("v")
+plt.legend(); plt.axis("equal"); plt.grid(True)
+plt.show()
