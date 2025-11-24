@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco model="Optimus Mechanism">
+
+    <option timestep="1e-3"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.08 0.08 0.08" rgb2="0.15 0.15 0.15" width="256" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.88 0.88 0.88" rgb2="0.72 0.65 0.55" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+        <material name="link_mat" reflectance="0.3"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10" diffuse="1 1 1" specular="0.1 0.1 0.1"/>
+        <light pos="0 0 10" diffuse="0.1 0.1 0.1" specular="0.1 0.1 0.1"/>
+        <geom type="plane" pos="0 0 0."size="0.5 0.5 0.1" material="grid"/>
+
+        <!-- Фиксированные точки -->
+        <site name="fixed_O" pos="0 0 0.02" size="0.008" rgba="0.6 0.2 0.8 1"/>
+        <site name="fixed_C" pos="0.054 0 0.02" size="0.008" rgba="0.6 0.2 0.8 1"/>
+        <site name="fixed_D" pos="0.081 0 0.02" size="0.008" rgba="0.6 0.2 0.8 1"/>
+
+        <!-- ОСНОВНАЯ ЦЕПОЧКА O-A-B - КРИВОШИП -->
+        <body name="OAB" pos="0 0 0.02" euler="0 0 0">
+            <joint name="O" type="hinge" axis="0 -1 0" damping="0.1"/>
+            <geom name="point_O" type="sphere" pos="0 0 0" size="0.008" rgba="0.95 0.15 0.15 1.0"/>
+            <geom name="link_OA" type="cylinder" pos="0.027 0 0" size="0.005 0.027" rgba="0.90 0.30 0.25 0.8" material="link_mat" euler="0 90 0"/>
+            <site name="sA" size="0.004" pos="0.054 0 0" rgba="1 1 1 0.8"/>
+
+            <body name="AB" pos="0.054 0 0" euler="0 0 0">
+                <joint name="A" type="ball" damping="0.1"/>
+                <geom name="point_A" type="sphere" pos="0 0 0" size="0.008" rgba="0.95 0.15 0.15 1.0"/>
+                <geom name="link_AB" type="cylinder" pos="0.0351 0 0" size="0.005 0.0351" rgba="0.90 0.65 0.20 0.8" material="link_mat" euler="0 90 0"/>
+                <site name="sB" size="0.004" pos="0.0702 0 0" rgba="1 1 1 0.8"/>
+            </body>
+        </body>
+
+        <!-- ЗВЕНО C-B - КОРОМЫСЛО -->
+        <body name="CB" pos="0.054 0 0.02" euler="0 0 0">
+            <joint name="C" type="hinge" axis="0 -1 0" damping="0.1"/>
+            <geom name="point_C" type="sphere" pos="0 0 0" size="0.008" rgba="0.95 0.15 0.15 1.0"/>
+            <geom name="link_CB" type="cylinder" pos="0.0405 0 0" size="0.005 0.0405" rgba="0.25 0.70 0.25 0.8" material="link_mat" euler="0 90 0"/>
+            <site name="sB_CB" size="0.004" pos="0.081 0 0" rgba="1 1 1 0.8"/>
+        </body>
+
+        <!-- ЗВЕНО D-B - ДОПОЛНИТЕЛЬНОЕ ЗВЕНО -->
+        <body name="DB" pos="0.081 0 0.02" euler="0 0 0">
+            <joint name="D" type="hinge" axis="0 -1 0" damping="0.1"/>
+            <geom name="point_D" type="sphere" pos="0 0 0" size="0.008" rgba="0.95 0.15 0.15 1.0"/>
+            <geom name="link_DB" type="cylinder" pos="-0.035 0 0" size="0.005 0.035" rgba="0.20 0.40 0.90 0.8" material="link_mat" euler="0 90 0"/>
+            <site name="sB_DB" size="0.004" pos="-0.07 0 0" rgba="1 1 1 0.8"/>
+        </body>
+
+    </worldbody>
+
+    <actuator>
+        <motor name="motor_O" joint="O" ctrlrange="-10 10" gear="1"/>
+    </actuator>
+
+    <sensor>
+        <jointpos name="sensor_O_pos" joint="O"/>
+    </sensor>
+
+    <equality>
+        <!-- СОЕДИНЕНИЕ ВСЕХ ТРЕХ ЗВЕНЬЕВ В ТОЧКЕ B -->
+        <connect name="eq_B_CB" site1="sB" site2="sB_CB" solimp="0.995 0.99 0.001" solref="0.01 1"/>
+        <connect name="eq_B_DB" site1="sB" site2="sB_DB" solimp="0.995 0.99 0.001" solref="0.01 1"/>
+    </equality>
+
+</mujoco>
