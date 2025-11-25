@@ -1,0 +1,202 @@
+import mujoco
+import mujoco.viewer
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+model = mujoco.MjModel.from_xml_path('tir6.xml')
+data = mujoco.MjData(model)
+
+
+EE_pose_x = []
+EE_pose_y = []
+actual_q1 = []
+actual_q2 = []
+error_q1 = []
+error_q2 = []
+
+
+SIMEND = 10.0
+TIMESTEP = 0.001
+STEP_NUM = int(SIMEND / TIMESTEP)
+timeseries = np.linspace(0, SIMEND, STEP_NUM)
+
+
+FREQ1, AMP1, BIAS1 = 2.08, np.deg2rad(34.75), np.deg2rad(-25.8)
+FREQ2, AMP2, BIAS2 = 2.79, np.deg2rad(41.02), np.deg2rad(37.9)
+
+theta_des_q1 = AMP1 * np.sin(FREQ1 * timeseries) + BIAS1
+theta_des_q2 = AMP2 * np.sin(FREQ2 * timeseries) + BIAS2
+
+
+# Для q1 
+KP1, KI1, KV1 = 6, 2.4, 3.75 
+
+# Для q2  
+KP2, KI2, KV2 = 3, 3, 0.75 
+
+
+integral_q1 = integral_q2 = 0.0
+
+
+end_site_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, "sens")
+
+
+with mujoco.viewer.launch_passive(model, data) as viewer:
+    for i in range(STEP_NUM):
+        if viewer.is_running():
+            err1 = theta_des_q1[i] - data.qpos[0]
+            integral_q1 += err1 * TIMESTEP
+            derivative1 = -data.qvel[0]  
+            torque1 = KP1 * err1 + KI1 * integral_q1 + KV1 * derivative1
+            
+            err2 = theta_des_q2[i] - data.qpos[1]
+            integral_q2 += err2 * TIMESTEP
+            derivative2 = -data.qvel[1]
+            torque2 = KP2 * err2 + KI2 * integral_q2 + KV2 * derivative2
+            
+            data.ctrl[0] = torque1
+            data.ctrl[1] = torque2
+            
+            pos_EE = data.site_xpos[end_site_id]
+            EE_pose_x.append(pos_EE[0])
+            EE_pose_y.append(pos_EE[2])
+            actual_q1.append(data.qpos[0])
+            actual_q2.append(data.qpos[1])
+            error_q1.append(err1)
+            error_q2.append(err2)
+            
+            mujoco.mj_step(model, data)
+            viewer.sync()
+        else:
+            break
+
+fig, axs = plt.subplots(2, 2, figsize=(14, 10))
+axs[0, 0].plot(EE_pose_x, EE_pose_y, 'b-', linewidth=1.5)
+axs[0, 0].set_title('End-effector Trajectory')
+axs[0, 0].set_xlabel('X [m]'); axs[0, 0].set_ylabel('Z [m]')
+axs[0, 0].axis('equal'); axs[0, 0].grid(True)
+
+axs[0, 1].plot(timeseries[:len(error_q1)], np.rad2deg(error_q1), 'r-', linewidth=1.5)
+axs[0, 1].set_title(f'Error q1 (KP={KP1}, KI={KI1}, KV={KV1})')
+axs[0, 1].set_xlabel('Time [s]'); axs[0, 1].set_ylabel('Error [deg]')
+axs[0, 1].grid(True); axs[0, 1].axhline(0, color='k', linestyle='--', alpha=0.5)
+axs[1, 0].plot(timeseries[:len(error_q2)], np.rad2deg(error_q2), 'g-', linewidth=1.5)
+axs[1, 0].set_title(f'Error q2 (KP={KP2}, KI={KI2}, KV={KV2})')
+axs[1, 0].set_xlabel('Time [s]'); axs[1, 0].set_ylabel('Error [deg]')
+axs[1, 0].grid(True); axs[1, 0].axhline(0, color='k', linestyle='--', alpha=0.5)
+
+axs[1, 1].plot(timeseries[:len(theta_des_q1)], np.rad2deg(theta_des_q1), 'b--', label='Desired', linewidth=1.5)
+axs[1, 1].plot(timeseries[:len(actual_q1)], np.rad2deg(actual_q1), 'b-', label='Actual', linewidth=1.5)
+axs[1, 1].set_title('q1: Desired vs Actual')
+axs[1, 1].set_xlabel('Time [s]'); axs[1, 1].set_ylabel('Angle [deg]')
+axs[1, 1].legend(); axs[1, 1].grid(True)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Макс ошибка q1: {np.rad2deg(np.max(np.abs(error_q1))):.2f}°")
+print(f"Макс ошибка q2: {np.rad2deg(np.max(np.abs(error_q2))):.2f}°")
+print("Симуляция завершена")
+
+
+
+
+
+
+-------------------------------------------------------
+
+<mujoco model="tendon">
+    <option timestep="1e-3"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <default>
+        <default class="visual_cylinder">
+          <geom type="cylinder" fromto="0 .015 0 0 -.015 0" size=".018" rgba=".3 .9 .3 .4"/>
+        </default>
+
+        <default class="visual_cylinder2">
+          <geom type="cylinder" fromto="0 .015 0 0 -.015 0" size=".037" rgba=".3 .9 .3 .4"/>
+        </default>
+    </default>
+
+    <worldbody>
+        <light pos="0 0 1"/>
+        <light pos="0 0 10"/>
+        <geom type="plane" size="0.5 0.5 0.1" material="grid"/>
+
+        <body name="Mechanism" pos="0 0 0.50" euler="0 0 0">
+            <site name="sWallUp1" size="0.005" pos="0.01 0 0.025"/>
+            <site name="sWallDown1" size="0.005" pos="0.01 0 -0.025"/>
+            <geom name="Wall" type="box" pos="0 0 0" size="0.005 0.1 0.1" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+            <geom name="link OA" type="cylinder" pos="0.102 0 0" size="0.015 0.097" rgba="0.21 0.32 0.82 0.5" euler="0 90 0" contype="0"/>
+
+            <body name="AB" pos="0.199 0 0" euler="0 0 0">
+                <site name="sWallUp2" size="0.005" pos="0 0 0.025"/>
+                <site name="sWallDown2" size="0.005" pos="0 0 -0.025"/>
+                <joint name="A" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0"/>
+                <geom name="g1" class="visual_cylinder"/>
+                <geom name="link AB" type="cylinder" pos="0.046 0 0" size="0.015 0.046" rgba="0.21 0.32 0.82 0.5" euler="0 90 0" contype="0"/>
+
+                <body name="BC" pos="0.092 0 0" euler="0 0 0">
+                    <joint name="B" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0"/>
+                    <site name="sWallUp3" size="0.005" pos="0 0 0.042"/>
+                    <site name="sWallDown3" size="0.005" pos="0 0 -0.042"/>
+                    <geom name="g2" class="visual_cylinder2"/>
+                    <geom name="link BC" type="cylinder" pos="0.063 0 0" size="0.015 0.063" rgba="0.21 0.32 0.82 0.5" euler="0 90 0" contype="0"/>
+                    <site name="sens" size="0.005" pos="0.126 0 0"/>
+                    <geom name="End" type="box" pos="0.136 0 0" size="0.01 0.015 0.06" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+                    <site name="sWallUp4" size="0.005" pos="0.121 0 0.042"/>
+                    <site name="sWallDown4" size="0.005" pos="0.121 0 -0.042"/>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <!-- Добавляем актуаторы -->
+    <actuator>
+        <!-- Актуатор для шарнира A (q1) -->
+        <position name="q1_actuator" joint="A"/>
+        <!-- Актуатор для шарнира B (q2) -->
+        <position name="q2_actuator" joint="B" />
+    </actuator>
+
+    <!-- Добавляем сенсоры -->
+    <sensor>
+        <!-- Позиция и скорость шарнира A (q1) -->
+        <framepos objtype="site" objname="sens"/>
+    </sensor>
+    <!-- Тросы -->
+    <tendon>
+        <spatial limited="false" range="0 0.6" width="0.0025">
+            <site site="sWallUp1"/>
+            <site site="sWallUp2"/>
+        </spatial>
+        <spatial limited="false" range="0 0.6" width="0.0025">
+            <site site="sWallUp2"/>
+            <site site="sWallDown3"/>
+        </spatial>
+        <spatial limited="false" range="0 0.6" width="0.0025">
+            <site site="sWallDown3"/>
+            <site site="sWallDown4"/>
+        </spatial>
+        <spatial limited="false" range="0 0.6" width="0.0025">
+            <site site="sWallDown1"/>
+            <site site="sWallDown2"/>
+        </spatial>
+        <spatial limited="false" range="0 0.6" width="0.0025">
+            <site site="sWallDown2"/>
+            <site site="sWallUp3"/>
+        </spatial>
+<spatial limited="false" range="0 0.6" width="0.0025">
+            <site site="sWallUp3"/>
+            <site site="sWallUp4"/>
+        </spatial>
+    </tendon>
+</mujoco>
