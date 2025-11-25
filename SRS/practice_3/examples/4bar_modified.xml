@@ -21,20 +21,20 @@
 
             <joint name="A" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0"/>
             <geom name="point A" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-            <geom name="link AB" type="cylinder" pos="0 -0.075 0" size="0.015 0.075" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+            <geom name="link AB" type="cylinder" pos="0 -0.05 0" size="0.015 0.05" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
 
-            <body name="BC1P" pos="0 -0.15 0" euler="0 0 0">
+            <body name="BC1P" pos="0 -0.1 0" euler="0 0 0">
 
                 <joint name="B" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0.1"/>
                 <geom name="point B" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-                <geom name="link BC" type="cylinder" pos="0 -0.1875 0" size="0.015 0.1875" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-                <site name="sC1" size="0.01" pos="0 -0.375 0"/>
+                <geom name="link BC" type="cylinder" pos="0 -0.125 0" size="0.015 0.125" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+                <site name="sC1" size="0.01" pos="0 -0.25 0"/>
 
-                <body name="CP" pos="0 -0.375 0" euler="0 0 0">
+                <body name="CP" pos="0 -0.25 0" euler="0 0 0">
 
                     <geom name="point C1" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-                    <geom name="link CP" type="cylinder" pos="0 -0.1875 0" size="0.015 0.1875" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-                    <site name="sP" size="0.01" pos="0 -0.375 0"/>
+                    <geom name="link CP" type="cylinder" pos="0 -0.125 0" size="0.015 0.125" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+                    <site name="sP" size="0.01" pos="0 -0.25 0"/>
 
                 </body>
 
@@ -42,12 +42,12 @@
 
         </body>
 
-        <body name="DC2" pos="0.3 0 1.5" euler="90 0 0">  
+        <body name="DC2" pos="0.2 0 1.5" euler="90 0 0">  
 
             <joint name="D" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0.1"/>
             <geom name="point D" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-            <geom name="link DC" type="cylinder" pos="0 -0.1875 0" size="0.015 0.1875" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-            <site name="sC2" size="0.01" pos="0 -0.375 0"/>
+            <geom name="link DC" type="cylinder" pos="0 -0.125 0" size="0.015 0.125" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+            <site name="sC2" size="0.01" pos="0 -0.25 0"/>
 
         </body>
         

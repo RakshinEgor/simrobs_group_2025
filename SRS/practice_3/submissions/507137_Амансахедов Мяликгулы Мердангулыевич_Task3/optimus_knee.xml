@@ -13,28 +13,26 @@
     <worldbody>
         <light pos="0 0 10"/>
         <geom type="plane" size="0.5 0.5 0.1" material="grid"/>
-        
         <camera name="side view" pos="0.1 -1.5 1.0" euler="90 0 0" fovy="60"/>
         <camera name="upper view" pos="0 0 1.5" euler="0 0 0"/>
-            
-        <body name="ABC1P" pos="0 0 1.5" euler="90 0 0">         
-
+        <body name="ABC1P" pos="0 0 1.5" euler="90 0 0">
             <joint name="A" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0"/>
             <geom name="point A" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-            <geom name="link AB" type="cylinder" pos="0 -0.075 0" size="0.015 0.075" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-
-            <body name="BC1P" pos="0 -0.15 0" euler="0 0 0">
-
+            <geom name="link AB" type="cylinder" pos="0 -0.01800 0" size="0.015 0.01800" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+            <body name="BC1P" pos="0 -0.03600 0" euler="0 0 0">
                 <joint name="B" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0.1"/>
                 <geom name="point B" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-                <geom name="link BC" type="cylinder" pos="0 -0.1875 0" size="0.015 0.1875" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-                <site name="sC1" size="0.01" pos="0 -0.375 0"/>
+                <geom name="link BC" type="cylinder" pos="0 -0.02340 0" size="0.015 0.02340" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
 
-                <body name="CP" pos="0 -0.375 0" euler="0 0 0">
+                <site name="sC1" size="0.01" pos="0 -0.08280 0"/>
+
+                <body name="CP" pos="0 -0.08280 0" euler="0 0 0">
 
                     <geom name="point C1" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-                    <geom name="link CP" type="cylinder" pos="0 -0.1875 0" size="0.015 0.1875" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-                    <site name="sP" size="0.01" pos="0 -0.375 0"/>
+
+                    <geom name="link CP" type="cylinder" pos="0 -0.09000 0" size="0.015 0.09000" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+
+                    <site name="sP" size="0.01" pos="0 -0.18000 0"/>
 
                 </body>
 
@@ -42,15 +40,17 @@
 
         </body>
 
-        <body name="DC2" pos="0.3 0 1.5" euler="90 0 0">  
+        <body name="DC2" pos="0.03600 0 1.5" euler="90 0 0">
 
             <joint name="D" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0.1"/>
             <geom name="point D" type="cylinder" pos="0 0 0" size="0.02 0.02" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
-            <geom name="link DC" type="cylinder" pos="0 -0.1875 0" size="0.015 0.1875" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
-            <site name="sC2" size="0.01" pos="0 -0.375 0"/>
+
+            <geom name="link DC" type="cylinder" pos="0 -0.02700 0" size="0.015 0.02700" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+
+            <site name="sC2" size="0.01" pos="0 -0.05400 0"/>
 
         </body>
-        
+
     </worldbody>
 
     <equality>
@@ -58,12 +58,11 @@
     </equality>
 
     <actuator>
-        <position name="A" joint="A"/>
+        <position name="A_act" joint="D"/>
     </actuator>
 
     <sensor>
         <framepos objtype="site" objname="sP"/>
     </sensor>
-
 
 </mujoco>

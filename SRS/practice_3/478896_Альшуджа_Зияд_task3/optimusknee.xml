@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+
+    <option timestep="1e-4"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.8 0.9 1" rgb2="0.2 0.3 0.6" width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.3 0.3 0.3" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.1"/>
+
+        <!-- Материалы с разными цветами для звеньев -->
+        <material name="crank_material" rgba="1.0 0.84 0.0 1" specular="0.8" shininess="0.9"/>
+        <material name="connecting_rod_material" rgba="0.2 0.4 0.9 1" specular="0.7" shininess="0.8"/>
+        <material name="rocker_material" rgba="0.3 0.7 0.3 1" specular="0.7" shininess="0.8"/>
+        <material name="joint_material" rgba="0.9 0.2 0.2 1" specular="1.0" shininess="1.0"/>
+        <material name="fixed_material" rgba="0.6 0.2 0.8 1" specular="0.6" shininess="0.7"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10" diffuse="0.8 0.8 0.8" specular="0.5 0.5 0.5"/>
+        <light pos="2 2 5" diffuse="0.5 0.5 0.5" specular="0.3 0.3 0.3"/>
+        <geom type="plane" size="0.5 0.5 0.1" material="grid"/>
+
+        <!-- Фиксированные точки -->
+        <site name="fixed_O" pos="0 0 0.02" size="0.008" material="fixed_material"/>
+        <site name="fixed_C" pos="0.054 0 0.02" size="0.008" material="fixed_material"/>
+        <site name="fixed_D" pos="0.081 0 0.02" size="0.008" material="fixed_material"/>
+
+        <!-- ОСНОВНАЯ ЦЕПОЧКА O-A-B - КРИВОШИП (ЗОЛОТОЙ) -->
+        <body name="OAB" pos="0 0 0.02" euler="0 0 0">
+            <joint name="O" type="hinge" axis="0 -1 0" damping="0.1"/>
+            <geom name="point O" type="sphere" pos="0 0 0" size="0.008" material="joint_material"/>
+            <geom name="link OA" type="cylinder" pos="0.027 0 0" size="0.005 0.027" material="crank_material" euler="0 90 0"/>
+            <site name="sA" size="0.004" pos="0.054 0 0" rgba="1 1 1 0.8"/>
+
+            <body name="AB" pos="0.054 0 0" euler="0 0 0">
+                <joint name="A" type="ball" damping="0.1"/>
+                <geom name="point A" type="sphere" pos="0 0 0" size="0.008" material="joint_material"/>
+                <geom name="link AB" type="cylinder" pos="0.0351 0 0" size="0.005 0.0351" material="connecting_rod_material" euler="0 90 0"/>
+                <site name="sB" size="0.004" pos="0.0702 0 0" rgba="1 1 1 0.8"/>
+            </body>
+        </body>
+
+        <!-- ЗВЕНО C-B - КОРОМЫСЛО (ЗЕЛЕНЫЙ) -->
+        <body name="CB" pos="0.054 0 0.02" euler="0 0 0">
+            <joint name="C" type="hinge" axis="0 -1 0" damping="0.1"/>
+            <geom name="point C" type="sphere" pos="0 0 0" size="0.008" material="joint_material"/>
+            <geom name="link CB" type="cylinder" pos="0.0405 0 0" size="0.005 0.0405" material="rocker_material" euler="0 90 0"/>
+            <site name="sB_CB" size="0.004" pos="0.081 0 0" rgba="1 1 1 0.8"/>
+        </body>
+
+        <!-- ЗВЕНО D-B (увеличено до 0.5) - ДОПОЛНИТЕЛЬНОЕ ЗВЕНО -->
+        <body name="DB" pos="0.081 0 0.02" euler="0 0 0">
+            <joint name="D" type="hinge" axis="0 -1 0" damping="0.1"/>
+            <geom name="point D" type="sphere" pos="0 0 0" size="0.008" material="joint_material"/>
+            <geom name="link DB" type="cylinder" pos="-0.035 0 0" size="0.005 0.035" material="connecting_rod_material" euler="0 90 0"/>
+            <site name="sB_DB" size="0.004" pos="-0.07 0 0" rgba="1 1 1 0.8"/>
+        </body>
+
+    </worldbody>
+
+    <equality>
+        <!-- СОЕДИНЕНИЕ ВСЕХ ТРЕХ ЗВЕНЬЕВ В ТОЧКЕ B -->
+        <connect site1="sB" site2="sB_CB"/>
+        <connect site1="sB" site2="sB_DB"/>
+    </equality>
+
+</mujoco>
