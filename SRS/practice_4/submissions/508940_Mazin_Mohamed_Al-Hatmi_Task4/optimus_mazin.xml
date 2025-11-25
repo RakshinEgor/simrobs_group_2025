@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mujoco model="optimus">
+
+    <option timestep="1e-4" gravity="0 0 -9.8"/>
+
+    <worldbody>
+        <light pos="0 0 10"/>
+
+        <!-- ground plane -->
+        <geom type="plane" size="0.5 0.5 0.1" rgba="0.8 0.8 0.8 1"/>
+
+        <!-- LEFT BRANCH -->
+        <body name="ABC1P" pos="0 0 1.5" euler="90 0 0">
+            <joint name="A" type="hinge" axis="0 0 1"/>
+
+            <geom type="capsule" fromto="0 0 0 0 -0.03 0" size="0.01"/>
+            <body name="BC1" pos="0 -0.03 0">
+                <joint name="B" type="hinge" axis="0 0 1" damping="0.1"/>
+
+                <geom type="capsule" fromto="0 0 0 0 -0.039 0" size="0.01"/>
+                <site name="sC1" size="0.01" pos="0 -0.039 0"/>
+
+                <body name="CP" pos="0 -0.039 0">
+                    <geom type="capsule" fromto="0 0 0 0 -0.045 0" size="0.01"/>
+                    <site name="sP" size="0.01" pos="0 -0.045 0"/>
+                </body>
+            </body>
+        </body>
+
+        <!-- RIGHT BRANCH -->
+        <body name="DC2" pos="0.18 0 1.5" euler="90 0 0">
+            <joint name="D" type="hinge" axis="0 0 1" damping="0.1"/>
+            <geom type="capsule" fromto="0 0 0 0 -0.15 0" size="0.01"/>
+            <site name="sC2" size="0.01" pos="0 -0.15 0"/>
+        </body>
+
+    </worldbody>
+
+    <!-- LOOP CLOSURE -->
+    <equality>
+        <connect site1="sC1" site2="sC2"/>
+    </equality>
+
+    <!-- ACTUATOR -->
+    <actuator>
+        <motor name="A_motor" joint="A" ctrlrange="-5 5" gear="1"/>
+    </actuator>
+
+    <!-- SENSORS -->
+    <sensor>
+        <jointpos name="q1_pos" joint="A"/>
+        <jointvel name="q1_vel" joint="A"/>
+        <framepos name="P_pos" objtype="site" objname="sP"/>
+    </sensor>
+
+</mujoco>
