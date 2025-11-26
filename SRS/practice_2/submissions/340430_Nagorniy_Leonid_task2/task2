@@ -1,0 +1,77 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from math import sqrt, exp, cos, sin
+
+# Параметры системы
+m = 0.8       
+k = 10.2      
+b = 0.025     
+x0 = 0.27     
+v0 = 0.0      
+g = 9.81      
+x_eq = -m * g / k
+z0 = x0 - x_eq
+zdot0 = v0
+
+# Характеристики колебаний
+omega_n = sqrt(k/m)
+zeta = b / (2 * sqrt(k*m))
+omega_d = omega_n * sqrt(max(0, 1 - zeta**2))
+
+print(f"ωₙ = {omega_n:.4f} рад/с, ζ = {zeta:.6f}, ω_d = {omega_d:.4f} рад/с")
+print(f"Положение равновесия x_eq = {x_eq:.4f} м")
+
+# Аналитическое решение
+def z_analytic(t):
+    if zeta < 1:
+        A = z0
+        B = (zdot0 + zeta*omega_n*z0) / omega_d
+        return np.exp(-zeta*omega_n*t) * (A * np.cos(omega_d*t) + B * np.sin(omega_d*t))
+    elif np.isclose(zeta, 1.0):
+        return (z0 + (zdot0 + omega_n*z0)*t) * np.exp(-omega_n*t)
+    else:
+        s1 = -omega_n*(zeta - sqrt(zeta**2 - 1))
+        s2 = -omega_n*(zeta + sqrt(zeta**2 - 1))
+        C1 = (zdot0 - s2*z0) / (s1 - s2)
+        C2 = z0 - C1
+        return C1*np.exp(s1*t) + C2*np.exp(s2*t)
+
+def x_analytic(t):
+    return z_analytic(t) + x_eq
+
+# Численное решение (метод Рунге–Кутты 4-го порядка)
+def deriv(t, y):
+    # y = [z, z']
+    return np.array([y[1], -(b/m)*y[1] - (k/m)*y[0]])
+
+def rk4(t0, t1, y0, n):
+    h = (t1 - t0) / n
+    t = np.linspace(t0, t1, n+1)
+    y = np.zeros((n+1, len(y0)))
+    y[0] = y0
+    for i in range(n):
+        k1 = deriv(t[i], y[i])
+        k2 = deriv(t[i] + h/2, y[i] + h*k1/2)
+        k3 = deriv(t[i] + h/2, y[i] + h*k2/2)
+        k4 = deriv(t[i] + h, y[i] + h*k3)
+        y[i+1] = y[i] + h*(k1 + 2*k2 + 2*k3 + k4)/6
+    return t, y
+
+#время
+t, y = rk4(0, 200, [z0, zdot0], 2000)
+z_num = y[:,0]
+x_num = z_num + x_eq
+x_an = x_analytic(t)
+
+max_err = np.max(np.abs(x_num - x_an))
+print(f"\nМаксимальная ошибка между численным и аналитическим решением: {max_err:.3e} м")
+plt.figure(figsize=(8,4))
+plt.plot(t, x_an, label='Аналитическое решение', linewidth=2)
+plt.plot(t, x_num, '--', label='Численное решение (RK4)', linewidth=1)
+plt.xlabel('t, с')
+plt.ylabel('x, м')
+plt.title('Сравнение аналитического и численного решений\nПружинно-массово-демпферная система')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
