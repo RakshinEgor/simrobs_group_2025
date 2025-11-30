@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="tendon tselishchev 505944">
+
+    <option timestep="0.0001" gravity="0 0 -9.81"/>
+
+    <asset>
+        <texture name="grid" type="2d" builtin="checker" rgb1=".1 .1 .1" rgb2=".6 .6 .6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="8 8" reflectance="0.2"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 5" dir="0 0 -1"/>
+        <geom type="plane" size="2 2 0.1" material="grid"/>
+
+        <body name="base" pos="0 0 0">
+
+            <body name="body_block1" pos="0.071 0 0">
+                <geom name="block1" type="cylinder" size="0.024 0.010" rgba="0.2 0.6 1 1"/>
+
+                <body name="t1_block1_body" pos="0 0 0">
+                    <joint name="t1_b1_x" type="slide" axis="1 0 0" limited="false"/>
+                    <joint name="t1_b1_y" type="slide" axis="0 1 0" limited="false"/>
+                    <geom type="sphere" size="0.003" rgba="0 1 0 0.8"/>
+                    <site name="t1_block1" size="0.004" group="3"/>
+                </body>
+                <body name="t2_block1_body" pos="0 0 0">
+                    <joint name="t2_b1_x" type="slide" axis="1 0 0" limited="false"/>
+                    <joint name="t2_b1_y" type="slide" axis="0 1 0" limited="false"/>
+                    <geom type="sphere" size="0.003" rgba="1 0 0 0.8"/>
+                    <site name="t2_block1" size="0.004" group="3"/>
+                </body>
+
+                <site name="s1_b1" pos="0  0.022 0" size="0.003" group="2"/>
+                <site name="s2_b1" pos="0 -0.022 0" size="0.003" group="2"/>
+            </body>
+
+            <body name="body_block2" pos="0.157 0 0"> <!-- 0.114 -->
+                <joint name="block2_y" type="slide" axis="0 1 0" 
+                       limited="true" range="-0.09 0.09" damping="0.5"/>
+
+                <geom name="block2" type="cylinder" size="0.04 0.010" rgba="1 0.6 0.2 1"/>
+
+                <body name="t1_block2_body" pos="0 0 0">
+                    <joint name="t1_b2_x" type="slide" axis="1 0 0" limited="false"/>
+                    <joint name="t1_b2_y" type="slide" axis="0 1 0" limited="false"/>
+                    <geom type="sphere" size="0.003" rgba="0 0 1 0.8"/>
+                    <site name="t1_block2" size="0.004" group="3"/>
+                </body>
+                <body name="t2_block2_body" pos="0 0 0">
+                    <joint name="t2_b2_x" type="slide" axis="1 0 0" limited="false"/>
+                    <joint name="t2_b2_y" type="slide" axis="0 1 0" limited="false"/>
+                    <geom type="sphere" size="0.003" rgba="1 1 0 0.8"/>
+                    <site name="t2_block2" size="0.004" group="3"/>
+                </body>
+
+                <site name="s1_b2" pos="0 -0.016 0" size="0.003" group="2"/>
+                <site name="s2_b2" pos="0  0.016 0" size="0.003" group="2"/>
+
+                <body name="load" pos="0.094 0 0">
+                    <geom type="box" size="0.005 0.04 0.025" rgba="0.7 0.7 0.7 1"/>
+                    <site name="s1_load" pos="0 -0.03 0" size="0.004" group="2"/>
+                    <site name="s2_load" pos="0  0.03 0" size="0.004" group="2"/>
+                </body>
+            </body>
+
+            <body name="left_wall" pos="-0.005 0 0">
+                <geom type="box" size="0.005 0.05 0.03" rgba="0.7 0.7 0.7 1"/>
+                <site name="s1_base" pos="0  0.042 0" size="0.004" group="2"/>
+                <site name="s2_base" pos="0 -0.042 0" size="0.004" group="2"/>
+            </body>
+        </body>
+    </worldbody>
+
+    <tendon>
+        <spatial limited="false" width="0.003" rgba="0 1 0 1">
+            <site site="s1_base"/>
+            <geom geom="block1" sidesite="s1_b1"/>
+            <site site="t1_block1"/>
+            <site site="t1_block2"/>
+            <geom geom="block2" sidesite="s1_b2"/>
+            <site site="s1_load"/>
+        </spatial>
+
+        <spatial limited="false" width="0.003" rgba="1 0 0 1">
+            <site site="s2_base"/>
+            <geom geom="block1" sidesite="s2_b1"/>
+            <site site="t2_block1"/>
+            <site site="t2_block2"/>
+            <geom geom="block2" sidesite="s2_b2"/>
+            <site site="s2_load"/>
+        </spatial>
+    </tendon>
+
+    <actuator>
+        <position joint="block2_y" kp="5" name="load_actuator"/>
+    </actuator>
+</mujoco>
