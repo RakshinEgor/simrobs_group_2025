@@ -1,0 +1,94 @@
+<mujoco model="optimus_knee">
+  <option timestep="1e-4" gravity="0 0 -9.81"/>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.6 0.8 1" rgb2="0.2 0.4 0.8" width="300" height="300"/>
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.9 0.9 0.9" width="150" height="150"/>
+    <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+  </asset>
+
+  <worldbody>
+    <light name="top" pos="0 0 10"/>
+    <body name="ground" pos="0 0 0">
+        <geom type="plane" size="2 2 0.1" material="grid"/>
+    </body>
+
+    <body name="OAB" pos="0 0 0.05" euler="90 0 90">
+      <joint name="O" type="hinge"
+             axis="0 0 1" stiffness="0"
+             springref="0" damping="0.02" limited="true" range="-60 135"/>
+      <geom name="point O" type="cylinder"
+            size="0.012 0.005" rgba="1 0 0 0.5"
+            euler="0 0 0" contype="0"/>
+      <geom name="link OA" type="cylinder"
+            size="0.005 0.028"
+            rgba="0.4 0.8 0.3 0.8"
+            contype="0" euler="0 90 0" pos="0.028 0 0"/>
+      <body name="AB" pos="0.056 0 0">
+        <joint name="A" type="hinge"
+               axis="0 0 1" stiffness="0"
+               springref="0" damping="0.02" limited="true" range="-150 -30"/>
+        <geom name="point A" type="cylinder"
+              size="0.012 0.005" rgba="1 0 0 0.5"
+              euler="0 0 0" contype="0"/>
+        <geom name="link AB" type="cylinder"
+              size="0.005 0.0364" rgba="0.4 0.8 0.3 0.8"
+              contype="0" euler="0 90 0" pos="0.0364 0 0"/>
+        <site name="B1" size="0.01" pos="0.0728 0 0"/>
+      </body>
+    </body>
+    <body name="CB" pos="0.056 0 0.05" euler="90 0 90">
+      <joint name="C" type="hinge"
+             axis="0 0 1" stiffness="0"
+             springref="0" damping="0.02" limited="true" range="-75 68"/>
+      <geom name="point C" type="cylinder"
+            size="0.012 0.005" rgba="1 0 0 0.5"
+            euler="0 0 0" contype="0"/>
+      <geom name="link CB" type="cylinder"
+            size="0.005 0.042"
+            rgba="0.4 0.8 0.3 0.8"
+            contype="0" euler="0 90 0" pos="0.042 0 0"/>
+      <site name="B2" size="0.01" pos="0.084 0 0"/>
+    </body>
+    <body name="DB" pos="0.336 0 0.05" euler="90 0 90">
+      <joint name="D" type="hinge"
+             axis="0 0 1" stiffness="0"
+             springref="0" damping="0.02" limited="true" range="0 85"/>
+      <geom name="point D" type="cylinder"
+            size="0.01 0.005" rgba="1 0 0 0.5"
+            euler="0 0 0" contype="0"/>
+      <geom name="link DS" type="cylinder"
+            size="0.005 0.11"
+            rgba="0.4 0.8 0.3 0.8"
+            contype="0" euler="0 90 0" pos="0.11 0 0"/>
+      <body name="slider SB" euler="0 0 0" pos="0.02 0 0">
+        <joint name="S" type="slide"
+               axis="1 0 0" stiffness="0"
+               springref="0" limited="true"
+               range="0 0.16"/>
+        <geom name="point S" type="cylinder"
+              size="0.01 0.01" rgba="1 0.5 0 0.9"
+              euler="0 90 0" contype="0" pos="0.01 0 0"/>
+        <geom name="link SB" type="cylinder"
+              euler="0 90 0" pos="0.1 0 0"
+              size="0.005 0.1" rgba="0 0 1 0.5"/>
+        <site name="B3" size="0.01" pos="0.2 0 0"/>
+      </body>
+    </body>
+  </worldbody>
+
+  <equality>
+    <connect site1="B1" site2="B2" solimp="0.99 0.999 0.01" solref="0.008 0.4"/>
+    <connect site1="B2" site2="B3" solimp="0.99 0.999 0.01" solref="0.008 0.4"/>
+  </equality>
+
+  <actuator>
+    <motor name="slider motor" joint="S" gear="1"/>
+  </actuator>
+
+  <sensor>
+    <jointpos name="O_ang" joint="O"/>
+    <jointvel name="O_vel" joint="O"/>
+    <framepos name="B_pos" objtype="site" objname="B1"/>
+  </sensor>
+</mujoco>
