@@ -1,0 +1,278 @@
+\documentclass[a4paper, 14pt]{extarticle}
+
+% Текст
+\usepackage[utf8]{inputenc} % UTF-8 кодировка
+\usepackage[russian]{babel} % Русский язык
+\usepackage{indentfirst} % красная строка в первом параграфе в главе
+% Отображение страниц
+\usepackage{geometry} % размеры листа и отступов
+\geometry{
+	left=30mm,
+	top=20mm,
+	right=15mm,
+	bottom=25mm,
+	marginparsep=0mm,
+	marginparwidth=0mm,
+	headheight=10mm,
+	headsep=7mm,
+	foot=0mm}
+\usepackage{afterpage,fancyhdr} % настройка колонтитулов
+
+\setlength{\baselineskip}{1.5em}
+\usepackage{titlesec}
+\renewcommand{\thesection}{}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\titleformat{\section}[block]{\centering\bfseries\Large}{}{5pt}{}
+\titleformat{\subsection}[block]{\bfseries\large}{}{5pt}{}
+
+\pagestyle{fancy}
+\fancypagestyle{style}{ % создание нового стиля style
+	\fancyhf{} % очистка колонтитулов
+    \fancyhead[LO, RE]{\nouppercase{ИМРС}} % название документа наверху
+    \fancyhead[RO, LE]{\nouppercase{\leftmark}} % название section наверху
+	\fancyfoot[C]{\thepage} % номер страницы справа внизу на нечетных и слева внизу на четных
+	\renewcommand{\headrulewidth}{0.25pt} % толщина линии сверху
+	\renewcommand{\footrulewidth}{0pt} % толцина линии снизу
+}
+\fancypagestyle{plain}{ % создание нового стиля plain -- полностью пустого
+	\fancyhf{}
+	\renewcommand{\headrulewidth}{0pt}
+}
+\fancypagestyle{title}{ % создание нового стиля title -- для титульной страницы
+	\fancyhf{}
+	\fancyhead[C]{{\footnotesize
+			Министерство образования и науки Российской Федерации\\
+			Федеральное государственное автономное образовательное учреждение высшего образования
+	}}
+	\fancyfoot[C]{{\large 
+			Санкт-Петербург, 2024-2025
+	}}
+	\renewcommand{\headrulewidth}{0pt}
+}
+
+% Математика
+\usepackage{amsmath, amsfonts, amssymb, amsthm} % Набор пакетов для математических текстов
+\usepackage{cancel} % зачеркивание для сокращений
+% Рисунки и фигуры
+\usepackage{graphicx} % вставка рисунков
+\usepackage{epstopdf}
+\usepackage{wrapfig, subcaption} % вставка фигур, обтекая текст
+\usepackage{caption} % для настройки подписей
+\captionsetup{figurewithin=none,labelsep=period, font={small,it}} % настройка подписей к рисункам
+% Рисование
+\usepackage{tikz} % рисование
+\usepackage{circuitikz}
+\usepackage{pgfplots} % графики
+\usepgfplotslibrary{fillbetween}
+% Таблицы
+\usepackage{multirow} % объединение строк
+\usepackage{multicol} % объединение столбцов
+% Остальное
+\usepackage[unicode, pdftex]{hyperref} % гиперссылки
+\usepackage{enumitem} % нормальное оформление списков
+\usepackage{float}
+
+\setlist{itemsep=0.15cm,topsep=0.15cm,parsep=1pt} % настройки списков
+% Теоремы, леммы, определения...
+\theoremstyle{definition}
+\newtheorem{Def}{Определение}
+\newtheorem*{Axiom}{Аксиома}
+\theoremstyle{plain}
+\newtheorem{Th}{Теорема}
+\newtheorem{Task}{Задание}
+\newtheorem{Lem}{Лемма}
+\newtheorem{Cor}{Следствие}
+\newtheorem{Ex}{Пример}
+\theoremstyle{remark}
+\newtheorem*{Note}{Замечание}
+\newtheorem*{Solution}{Решение}
+\newtheorem*{Proof}{Доказательство}
+% Свои команды
+\newcommand{\comb}[1]{\left[\hspace{-4pt}\begin{array}{l}#1\end{array}\right.\hspace{-5pt} } % совокупность уравнений
+\newcommand{\rank}{\mathrm{rank}\;}
+% Титульный лист
+
+\usepackage{listings}
+\newcommand*{\titlePage}{
+	\thispagestyle{title}
+	\begingroup
+	\begin{center}
+		%		{\footnotesize
+			%			Министерство образования и науки Российской Федерации\\
+			%			Федеральное государственное автономное образовательное учреждение высшего образования
+			%		}
+		%		
+		\vspace*{3ex}
+		{\small
+			САНКТ-ПЕТЕРБУРГСКИЙ НАЦИОНАЛЬНЫЙ ИССЛЕДОВАТЕЛЬСКИЙ УНИВЕРСИТЕТ ИНФОРМАЦИОННЫХ ТЕХНОЛОГИЙ, МЕХАНИКИ И ОПТИКИ	
+		}
+		
+		\vspace*{2ex}
+		
+		{\normalsize
+			Факультет систем управления и робототехники
+		}
+		
+		\vspace*{15ex}
+		
+		{\Large \bfseries 
+			Отчёт по лабораторной работе №4 (8)\\
+			{\large по теме <<Дифференциальные уравнения>>\\
+				по дисциплине "Имитационное моделирование робототехнических систем"\\
+				}
+			
+		}
+		
+	\end{center}
+	\vspace*{10ex}
+	\begin{flushright}
+		{\large 
+			\underline{Выполнил}: студент гр. \textbf{}\\
+			\begin{flushright}
+				\textbf{Магазенков Е. Н.}\\
+			\end{flushright}
+		}
+		\vspace*{5ex}
+		{\large 
+			\underline{Преподаватели}:\\ 
+			\begin{flushright}
+            \textit{Борисов И. И., Ракшин Е. А.}
+			\end{flushright}
+		}
+	\end{flushright}	
+	\newpage
+	\setcounter{page}{1}
+	\endgroup}
+%\usepackage{newtxmath,newtxtext}
+%\lstset{literate={а}{\cyra}1{б}{\cyrb}1{в}{\cyrv}1{г}{\cyrg}1{д}{\cyrd}1{е}{\cyre}1{ж}{\cyrzh}1{з}{\cyrz}1{и}{\cyri}1{к}{\cyrk}1{л}{\cyrl}1{м}{\cyrm}1{н}{\cyrn}1{о}{\cyro}1{п}{\cyrp}1{р}{\cyrr}1{с}{\cyrs}1{т}{\cyrt}1{у}{\cyru}1{ф}{\cyrf}1{х}{h}1{ц}{w}1{ч}{\cyrch}1{ш}{\cyrsh}1{щ}{\cyrshch}1{ь}{m}1{ъ}{m}1{ы}{y}1{э}{e}1{ю}{\cyryu}1{я}{\cyrya}}
+
+\lstset{basicstyle=\small}
+\newcommand{\tasknum}[3]{Task}%\textunderscore{#1}\textunderscore{#2}y\textunderscore{#2}\textunderscore{#3}}
+\usepackage{pdfpages}
+
+\newcommand{\mat}[1]{\begin{pmatrix}#1\end{pmatrix}} 
+\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}} 
+
+\newcommand{\code}[2]
+{
+\begin{minipage}{0.45\textwidth}
+    \textbf{Code:}
+    #1
+\end{minipage}
+}
+
+\begin{document}
+\renewcommand{\contentsname}{\hfillОГЛАВЛЕНИЕ\hfill} 
+\titlePage
+\thispagestyle{plain}
+\tableofcontents
+\pagestyle{style}
+
+\newpage
+\setcounter{page}{1}
+
+% \includepdf[pages={33}, scale=1,addtotoc={1, section, 1, {Текст задания}, text}]{./Tasks.pdf}
+
+\begin{table}
+    \centering
+    \caption{Вариант задания}
+    \begin{tabular}
+        {|c|c|c|c|}
+        \hline 
+        $a$ & $b$ & $c$ & $d$ \\
+        \hline
+        $-7$&	$-8.6$&	$1.66$& $8.12$\\
+        \hline
+    \end{tabular}
+\end{table}
+\section{Аналитическое решение уравнения}
+Решим уравнение
+\[
+    a\ddot{x} + b\dot{x} + c x = d.
+\] 
+Для этого решим соответствующее однородное линейное уравнение:
+\[
+    a\ddot{x} + b\dot{x} + cx = 0.
+\] 
+Составим характеристическое уравнение
+\[
+    a\lambda^2 + b\lambda + c = 0 \Leftrightarrow \lambda_{12} = \frac{-b \pm \sqrt{b^2-4ac}}{2a}. 
+\] 
+Тогда решением однородного уравнения будет 
+\[
+    x = C_1 e^{\lambda_1 t} + C_2 e^{\lambda_2 t}.
+\] 
+
+Правая часть исходного неоднородного уравнения имеет константный вид, поэтому будем искать частное решение в виде $x = D$. Очевидно, получается, что $D = \frac{d}{c}$.
+
+Таким образом, общее решение исходного уравнения имеет вид
+\[
+    x = C_1 e^{\lambda_1 t} + C_2 e^{\lambda_2 t} + \frac{d}{c}.
+\] 
+
+При подстановке значений из варианта, получаем уравнение
+\[
+    -7\ddot{x} - 8.6 \dot{x} + 1.66 x = 8.12
+\] 
+и $\lambda_1=0.1696$, $\lambda_2 = -1.3982$, а значит решение 
+\[
+    x = C_1 e^{0.1696t} + C_2 e^{-1.3982t} + 4.8916.
+\] 
+
+\section{Численное решение уравнения}
+Численно будем решать в виде системы уравнений первого порядка. Для этого приведем исходное уравнение к виду
+\[
+    \underbrace{\mat{\dot x\\\ddot{x}}}_\mathbf{x} = \mat{0 & 1 \\ -\frac{c}{a} & -\frac{b}{a}} \mat{x \\ \dot{x}} + \mat{0\\ \frac{d}{a}}.
+\] 
+
+Рассмотрим методы:
+\begin{itemize}
+    \item прямого Эйлера
+        \[
+            \mathbf{x}_{k+1} = \mathbf{x}_k + h\cdot f(t_k, \mathbf{x}_k),
+        \] 
+    \item обратного Эйлера
+        \[
+            \mathbf{x}_{k+1} = \mathbf{x}_k + h\cdot f(t_{k+1}, \mathbf{x}_{k+1}),
+        \] 
+    \item Рунге-Кутты 4-ого порядка
+        \[
+            \mathbf{x}_{k+1} = \mathbf{x}_k + \frac{h}{6}\left(  k_1 + 2k_2 + 2k_3+k_4) \right),
+        \] где $k_1= f(t_k, \mathbf{x}_k)$, $k_2= f(t_k+\frac{h}{2}, \mathbf{x}_k + \frac{h}{2} k_1)$, $k_3= f(t_k + \frac{h}{2}, \mathbf{x}_k + \frac{h}{2} k_2)$, $k_4= f(t_k + h, \mathbf{x}_k + h k_3)$.
+\end{itemize}
+
+
+\section{Результаты}
+Промоделируем с произвольным зафиксированным начальным условием $x(0)=452, \dot{x}(0)=449$ и разными шагами $h\in \{0.1, 0.01, 0.001\}$. Результаты с графиками решений уравнения и графиками ошибок численного решения от аналитического представлены на рисунках \ref{1}-\ref{3}. 
+\begin{figure}
+    [H]
+    \centering
+    \includegraphics[width=1\textwidth]{0.1}
+    \caption{Решение уравнения с шагом $h=0.1$ }
+    \label{1}
+\end{figure}
+\begin{figure}
+    [H]
+    \centering
+    \includegraphics[width=1\textwidth]{0.01}
+    \caption{Решение уравнения с шагом $h=0.01$ }
+    \label{2}
+\end{figure}
+\begin{figure}
+    [H]
+    \centering
+    \includegraphics[width=1\textwidth]{0.001}
+    \caption{Решение уравнения с шагом $h=0.001$ }
+    \label{3}
+\end{figure}
+
+\section{Выводы}
+Из результатов видно подтверждение теоретических знаний об ошибках численных методов:
+\begin{itemize}
+    \item С уменьшением величины шага $h$ уменьшается ошибка решения.
+    \item При этом у метода Рунге-Кутты ошибка сильно меньше, так как он четвертого порядка и имеет накопительную ошибку четвертого порядка от величины шага, в то время как методы прямого и обратного Эйлера имеют ошибку первого порядка (то есть сопоставимую с величиной шага).
+    \item Также стоит отметить, что метод обратного Эйлера в данном уравнении не дает преимущества, а только увеличивает вычислительную сложность в силу своей неявности. В жестких системах он будет необходим, но тут не дает преимущества.
+\end{itemize}
+
+\end{document}
+

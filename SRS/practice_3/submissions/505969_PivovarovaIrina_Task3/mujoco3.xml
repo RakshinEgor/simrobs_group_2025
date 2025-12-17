@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco model="tendon">
+
+  <statistic center="0 0 0.55" extent="1.1"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="-90" elevation="-20"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0"
+             width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge"
+             rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8"
+             width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true"
+              texrepeat="5 5" reflectance="0.2"/>
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+    <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+  </asset>
+
+  <worldbody>
+
+    <light pos="0 0 3" dir="0 0 -1" directional="false"/>
+    <geom name="floor" size="0 0 0.125" type="plane" material="groundplane" conaffinity="15" condim="3"/>
+
+    <body name="wall_1" pos="0 0 0" euler="0 90 0">
+        <geom name="wall_geom_1" type="plane" size="0.1 0.1 0.1" material="grid"/>
+    </body>
+
+    <body name="Frame" pos="0 0 0">
+
+        <!-- Pulley 1 -->
+        <body name="pulley1_body" pos="{a} 0 0.05">
+            <joint name="joint_pulley1" type="hinge" axis="0 1 0" limited="true" range="0 360"/>
+            <geom name="pulley1" type="cylinder" size="{R1/2} 0.005" euler="90 0 0"/>
+            <site name="red1"   pos="0 0 {R1/2}" size="0.003"/>
+            <site name="green1" pos="0 0 {- R1/2}" size="0.003"/>
+
+            <!-- Pulley 2 -->
+            <body name="pulley2_body" pos="{c} 0 0">
+                <joint name="pulley2_slide_z" type="slide" axis="0 0 1"/>
+                <geom name="pulley2" type="cylinder" size="{R2/2} 0.005" euler="90 0 0"/>
+                <site name="red2"   pos="0 0 {- R2/2}" size="0.003"/>
+                <site name="green2" pos="0 0 { R2/2}" size="0.003"/>
+                <site name="pulley2_connector" pos="0 0 0" size="0.003"/>
+
+                <body name="wall_2" pos="{b} 0 0">
+                    <joint name="wall2_slide_z" type="slide" axis="0 0 1" limited="true" range="0 0.2"/> 
+                    <geom name="wall_geom_2" type="box" size="0.005 0.03 0.04" material="grid" contype="1" conaffinity="1"/>
+                    <site name="red3"   pos="0 0 {-R2/2}" size="0.003"/>
+                    <site name="green3" pos="0 0 { R2/2}" size="0.003"/>
+                    <site name="wall2_connector" pos="0 0 0"/>
+                </body>
+
+            </body> 
+
+        </body> 
+
+    </body> 
+
+    <site name="red0"   pos="0 0 {0.05 + R1/2}" size="0.003"/>
+    <site name="green0" pos="0 0 {0.05 - R1/2}" size="0.003"/>
+
+  </worldbody>
+
+  <equality>
+    <connect site1="pulley2_connector" site2="wall2_connector"/>
+  </equality>
+
+
+  <tendon>
+    <spatial stiffness="100" rgba="1 0 0 1" width="0.0015">
+      <site site="red0"/>
+      <site site="red1"/>
+      <site site="red2"/>
+      <site site="red3"/>
+    </spatial>
+  </tendon>
+
+  <tendon>
+    <spatial stiffness="100" rgba="0 1 0 1" width="0.0015">
+      <site site="green0"/>
+      <site site="green1"/>
+      <site site="green2"/>
+      <site site="green3"/>
+    </spatial>
+  </tendon>
+
+</mujoco>

@@ -1,0 +1,85 @@
+<!-- 
+R1, m	R2, m	a, m	b, m	c, m												
+0.21	0.17	0.45	0.99	0.43
+-->
+
+<mujoco>
+	<option gravity="0 0 0" />
+	<worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+		<geom name="right_plane" type="box" size=".05 .5 .5" rgba="0.8 0.8 0.8 1"/>
+
+		<site name="s1" size="0.05" pos="0.09 0 0.21"/>
+		<site name="s2" size="0.05" pos="0.09 0 -0.21"/>
+
+		<body pos="2 0 0">		
+			<geom name="left_plane" type="box" size=".05 .5 .5" rgba="0.8 0.8 0.8 1"/>
+			<joint type="slide" axis="0 0 1"/>
+			<site name="left_plane_site" size="0.05" pos="0 0 0"/>
+		</body>
+
+		<body pos="0.45 0 0">
+			<joint type="hinge" axis="0 1 0"/>
+			<geom name="pulley1" type="cylinder" size=".21 .1" rgba="0 0.9 0 0.25" euler="90 0 0 "/>
+			<site name="pulley1_up_site" size="0.02" pos="0.1 0 0.25"/>
+			<site name="pulley1_down_site" size="0.02" pos="0.1 0 -0.25"/>
+
+			<site name="pulley1_pulley2_mid_site" size="0.02" pos="0.5 0 0"/>
+
+			<body pos="1 0 0">
+				<joint type="hinge" axis="0 1 0"/>
+				<geom name="pulley2" type="cylinder" size=".17 .1" rgba="0.9 0 0 0.25" euler="90 0 0 "/>
+				<site name="pulley2_up_site" size="0.02" pos="0 0 0.25"/>
+				<site name="pulley2_down_site" size="0.02" pos="0 0 -0.25"/>
+
+				<body pos="0.43 0 0">
+					<!-- <geom type="box" size=".05 .1 .5" rgba="0.9 0.9 0.9 1"/> -->
+					<site name="s3" size="0.05" pos="0 0 0.21"/>
+					<site name="s4" size="0.05" pos="0 0 -0.21"/>
+					<site name="end_effector_site" size="0.05" pos="0 0 0"/>
+				</body>
+
+			</body>
+
+		</body>
+
+	</worldbody>
+
+	<equality>
+            <weld site1="left_plane_site" site2="end_effector_site" torquescale="100"/>
+	</equality>
+
+	<tendon>
+		<spatial name="tendon_1" width=".025" rgba=".95 .3 .3 1" stiffness="500000" damping="1000">
+			<site site="s1"/>
+			<geom geom="pulley1" sidesite="pulley1_up_site" />
+			<site site="pulley1_pulley2_mid_site"/>
+			<geom geom="pulley2" sidesite="pulley2_down_site"/>
+			<site site="s4"/>
+		</spatial>
+  	</tendon>
+
+	<tendon>
+		<spatial name="tendon_2" width=".025" rgba=".0 .9 .3 1" stiffness="500000" damping="1000">
+			<site site="s2"/>
+			<geom geom="pulley1" sidesite="pulley1_down_site" />
+			<site site="pulley1_pulley2_mid_site"/>
+			<geom geom="pulley2" sidesite="pulley2_up_site"/>
+			<site site="s3"/>
+		</spatial>
+  	</tendon>
+
+
+	<actuator>
+		<general name="general1" tendon="tendon_1" gear="100000"/>
+		<general name="general2" tendon="tendon_2" gear="100000"/>
+	</actuator>
+
+	<sensor>
+		<framepos objtype="site" objname="end_effector_site"/>
+	</sensor>
+
+</mujoco>
+
+
+

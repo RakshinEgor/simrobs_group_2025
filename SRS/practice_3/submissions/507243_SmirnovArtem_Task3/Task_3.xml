@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+
+    <option timestep="1e-3"/>
+    <option gravity="0 0 -9.8"/>
+
+    
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.9 0.9 1.0" rgb2="0.4 0.4 0.6" width="256" height="256"/>
+        <texture name="floor" type="2d" builtin="checker" rgb1="0.2 0.2 0.2" rgb2="0.5 0.5 0.5" width="300" height="300"/>
+        <material name="floor_mat" texture="floor" texrepeat="8 8" reflectance="0.1"/>
+        <material name="node_color" rgba="0.95 0.2 0.2 0.7"/>
+        <material name="rod_color" rgba="0.25 0.45 0.85 0.7"/>
+        <material name="slider_color" rgba="0.3 0.7 0.3 0.7"/>
+    </asset>
+
+    <worldbody>
+
+        <light pos="2 1 5" dir="0 0 -1" directional="true"/>
+        <light pos="1 0 5" directional="false"/>
+        
+        <geom type="plane" size="0.6 0.6 0.1" material="floor_mat"/>
+
+        <body name="arm1_base" pos="0 0 1" euler="0 0 0">         
+            <joint name="pivot1" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0"/>
+            <geom name="base_node" type="cylinder" pos="0 0 0" size="0.005 0.005" material="node_color" euler="0 0 0" contype="0"/>
+            <geom name="first_segment" type="cylinder" pos="0 0 0.0365" size="0.005 0.0365" material="rod_color" euler="0 0 0" contype="0"/>
+
+            <body name="arm1_extension" pos="0 0 0.073" euler="0 0 0">
+                <joint name="elbow1" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0.1"/>
+                <geom name="middle_node" type="cylinder" pos="0 0 0" size="0.005 0.005" material="node_color" euler="0 0 0" contype="0"/>
+                <geom name="second_segment" type="cylinder" pos="0 0 0.04745" size="0.005 0.04745" material="rod_color" euler="0 0 0" contype="0"/>
+                <site name="end_effector1" size="0.005" pos="0 0 0.0949"/>
+            </body>
+        </body>
+
+        <body name="arm2_base" pos="0.073 0 1" euler="0 0 0">  
+            <joint name="pivot2" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0.1"/>
+            <geom name="side_node" type="cylinder" pos="0 0 0" size="0.005 0.005" material="node_color" euler="0 0 0" contype="0"/>
+            <geom name="side_rod" type="cylinder" pos="0 0 0.05475" size="0.005 0.05475" material="rod_color" euler="0 0 0" contype="0"/>
+            <site name="end_effector2" size="0.005" pos="0 0 0.1095"/>
+        </body>
+
+        <body name="slider_assembly" pos="0.365 0 1" euler="0 0 0">         
+            <joint name="fixed_pivot" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0"/>
+            <geom name="anchor_node" type="cylinder" pos="0 0 0" size="0.005 0.005" material="node_color" euler="0 0 0" contype="0"/>
+            <geom name="vertical_rod" type="cylinder" pos="0 0 0.12" size="0.005 0.12" material="slider_color" euler="0 0 0" contype="0"/>
+
+            <body name="sliding_part" pos="0 0 0.08" euler="0 0 0">
+                <joint name="prismatic" type="slide" axis="0 0 1" limited="true" range="-0.1 0.1" stiffness="0" springref="0" damping="0"/>
+                <geom name="slider_node" type="cylinder" pos="0 0 0" size="0.005 0.005" material="node_color" euler="0 0 0" contype="0"/>
+                <geom name="extended_rod" type="cylinder" pos="0 0 0.08" size="0.005 0.12" material="slider_color" euler="0 0 0" contype="0"/>
+                <site name="end_effector3" size="0.005" pos="0 0 0.225"/>
+            </body>
+        </body>
+
+    </worldbody>
+
+    <equality>
+        <connect site1="end_effector1" site2="end_effector2"/>
+        <connect site1="end_effector1" site2="end_effector3"/>
+    </equality>
+
+</mujoco>

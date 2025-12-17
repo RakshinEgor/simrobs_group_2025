@@ -23,5 +23,8 @@
         "--style",
         ".style.yapf"
     ],
-    "cSpell.language": "en,ru"
+    "cSpell.language": "en,ru",
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python-envs.pythonProjects": []
 }

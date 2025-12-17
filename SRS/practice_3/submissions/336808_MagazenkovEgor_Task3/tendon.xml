@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+
+    <option timestep="1e-4"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10"/>
+
+        <geom type="plane" size="0.5 0.5 1" material="grid" euler="90 0 0" contype="0"/>
+        <site name="fix1" pos="0 0 0.016" size="0.001"/>
+        <site name="fix2" pos="0 0 -0.016" size="0.001"/>
+        
+        <!-- <camera name="side view" pos="0.5 0.05 0" euler="-90 0 0"/> -->
+        <!-- <camera name="upper view" pos="0 0 1.5" euler="0 0 0"/> -->
+
+        <body>
+            <joint type="hinge" axis="0 1 0"/>
+            <geom pos="0.005 0 0" size="0.001" mass="0.001" contype="0"/>
+            <body name="link 1">
+                <geom name="link 1 beam" type="cylinder" pos="0.005 0.027 0" size="0.001 0.027" euler="90 0 0" mass="1." contype="0" rgba="0 0 1 0.6"/>
+                <body name="link 2" pos="0 0.054 0">
+                    <!-- <joint name='sphere1z' type="slide" axis="0 0 1" pos="0 0 0"/> -->
+                    <!-- <joint name='sphere1y' type="slide" axis="0 1 0" pos="0 0 0"/> -->
+                    <joint type="hinge" axis="1 0 0"/>
+                    <geom name="joint 1" type="cylinder" pos="0.0025 0 0" size="0.005 0.002" euler="0 90 0" mass="0.001" contype="0" rgba="1 0 0 0.6"/>
+                    <geom name="circ 1" type="cylinder" size="0.016 0.002" euler="0 90 0" mass="1" contype="0"/>
+                    <site name="fix1_1" pos="0 0 0.016" size="0.001"/>
+                    <site name="fix2_1" pos="0 0 -0.016" size="0.001"/>
+
+                    <geom name="link 2 beam" type="cylinder" pos="0.005 0.0275 0" size="0.001 0.0275" euler="90 0 0" mass="1." contype="0" rgba="0 1 0 0.6"/>
+                    <body name="link 3" pos="0 0.055 0">
+                        <!-- <joint name='sphere2z' type="slide" axis="0 0 1" pos="0 0 0"/> -->
+                        <!-- <joint name='sphere2y' type="slide" axis="0 1 0" pos="0 0 0"/> -->
+                        <joint type="hinge" axis="1 0 0"/>
+                        <geom name="joint 2" type="cylinder" pos="0.0025 0 0" size="0.005 0.002" euler="0 90 0" mass="0.001" contype="0" rgba="1 0 0 0.6"/>
+                        <geom name="circ 2" type="cylinder" size="0.0105 0.002" euler="0 90 0" mass="1" contype="0"/>
+                        <site name="fix1_2" pos="0 0 -0.0105" size="0.001"/>
+                        <site name="fix2_2" pos="0 0 0.0105" size="0.001"/>
+
+                        <geom name="link 3 beam" type="cylinder" pos="0.005 0.0355 0" size="0.001 0.0355" euler="90 0 0" mass="1." contype="0" rgba="0 0 1 0.6"/>
+                        <body name="ee" pos="0 0.071 0">
+                            <joint type="hinge" axis="1 0 0"/>
+                            <geom pos="0.005 0 0" size="0.001" mass="0.001" contype="0"/>
+                            <geom type="box" size="0.05 0.001 0.05" mass="10" contype="0"/>
+                            <site name="rfix1" pos="0 0 0.0105" size="0.001"/>
+                            <site name="rfix2" pos="0 0 -0.0105" size="0.001"/>
+                        </body>
+                    </body>
+                </body>
+                
+
+            </body>
+        </body>
+
+
+        
+    </worldbody>
+
+  <tendon>
+    <spatial width=".0005">
+      <site site="fix1"/>
+      <site site="fix1_1"/>
+      <site site="fix1_2"/>
+      <site site="rfix2"/>
+    </spatial>
+  </tendon>
+  <tendon>
+    <spatial width=".0005">
+      <site site="fix2"/>
+      <site site="fix2_1"/>
+      <site site="fix2_2"/>
+      <site site="rfix1"/>
+    </spatial>
+  </tendon>
+
+</mujoco>

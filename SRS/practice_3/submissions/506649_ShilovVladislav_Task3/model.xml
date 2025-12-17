@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+    <option timestep="1e-4"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.89 0.85 1" rgb2="0.8 0.65 0.7" width="256" height="256"/>
+        <texture name="floor_pattern" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="256" height="256"/>
+        <material name="floor_material" texture="floor_pattern" texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10"/>
+        <geom type="plane" size="0.5 0.5 0.1" material="floor_material" pos="0 0 -0.5"/>
+
+        <body name="base_platform" pos="0 0 0" euler="0 90 0">
+            <geom type="box" size="0.05 0.01 0.002" rgba="0.2 0.6 1 1"/>
+            <site name="left_tendon_anchor" pos="0.015 0 0" type="sphere" size="0.001"/>
+            <site name="right_tendon_anchor" pos="-0.015 0 0" type="sphere" size="0.001"/>
+        </body>
+
+        <body name="carriage_guide" pos="0.148 0 0">
+            <site name="carriage_attachment" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="guide_slide_x" type="slide" axis="1 0 0"/>
+            <joint name="guide_slide_z" type="slide" axis="0 0 1"/>
+            <geom type="box" size="0.0002 0.0002 0.0002" mass="0.000001" contype="0"/>
+        </body>
+
+        <body name="first_arm" pos="0 0 0" euler="0 0 0">
+            <geom type="cylinder" pos="0.02 0 0" euler="0 90 0" mass="0.001" size="0.002 0.02" rgba="0 0 1 0.5"/>
+
+            <body name="second_arm" pos="0.04 0 0" euler="0 0 0">
+                <joint name="first_joint" type="hinge" axis="0 1 0" stiffness="0" springref="0" damping="0"/>
+                <geom type="cylinder" mass="0.001" pos="0.031 0 0" size="0.002 0.031" euler="0 90 0" rgba="0 0 1 0.5"/>
+
+                <geom name="first_pulley" type="cylinder" size="0.015 0.01" pos="0 0 0" euler="90 0 0" rgba="1 1 1 0.8" mass="0.001"/>
+                <site name="first_pulley_bottom" pos="0 0 -0.01515" type="sphere" size="0.001"/>
+                <site name="first_pulley_top" pos="0 0 0.01515" type="sphere" size="0.001"/>
+                <site name="first_pulley_center" pos="0 0 0" type="sphere" size="0.001"/>
+
+                <body name="third_arm" pos="0.062 0 0" euler="0 0 0">
+                    <joint name="second_joint" type="hinge" axis="0 1 0" stiffness="0" springref="0" damping="0"/>
+                    <geom type="cylinder" pos="0.023 0 0" size="0.002 0.023" euler="0 90 0" rgba="0 0 1 0.5" mass="0.0001"/>
+
+                    <geom name="second_pulley" type="cylinder" size="0.0125 0.01" pos="0 0 0" euler="90 0 0" mass="0.001" rgba="1 1 1 0.8"/>
+                    <site name="second_pulley_top" pos="0 0 0.012515" type="sphere" size="0.001"/>
+                    <site name="second_pulley_bottom" pos="0 0 -0.012515" type="sphere" size="0.001"/>
+                    <site name="second_pulley_center" pos="0 0 0" type="sphere" size="0.001"/>
+                    <site name="carriage" pos="0.046 0 0" type="sphere" size="0.001"/>
+
+                    <body name="carriage" pos="0.046 0 0" euler="0 0 0">
+                        <geom type="box" size="0.002 0.002 0.0125" pos="0 0 0" rgba="0.9 0.9 0.9 0.5" mass="0.000001"/>
+                        <site name="carriage_top" pos="0 0 0.0125" type="sphere" size="0.001"/>
+                        <site name="carriage_bottom" pos="0 0 -0.0125" type="sphere" size="0.001"/>
+                    </body>
+                </body>
+            </body>
+        </body>
+
+        <body name="tendon_guide_point" pos="0.071 0 0">
+            <geom type="box" size="0.00001 0.0001 0.0001" contype="0" mass="0.0001"/>
+            <site name="guide_point_center" pos="0 0 0" type="cylinder" size="0.0001 0.00001"/>
+            <joint name="guide_slide_x2" type="slide" axis="1 0 0"/>
+            <joint name="guide_slide_z2" type="slide" axis="0 0 1"/>
+        </body>
+    </worldbody>
+
+    <tendon>
+        <spatial name="left_tendon" width="0.001" stiffness="100" damping="2" springlength="0.0005" rgba="1 0 0 1">
+            <site site="right_tendon_anchor"/>
+            <geom geom="first_pulley" sidesite="first_pulley_top"/>
+            <site site="guide_point_center"/>
+            <geom geom="second_pulley" sidesite="second_pulley_bottom"/>
+            <site site="carriage_bottom"/>
+        </spatial>
+    </tendon>
+
+    <tendon>
+        <spatial name="right_tendon" width="0.001" stiffness="100" damping="2" springlength="0.0005" rgba="0 1 0 1">
+            <site site="left_tendon_anchor"/>
+            <geom geom="first_pulley" sidesite="first_pulley_bottom"/>
+            <site site="guide_point_center"/>
+            <geom geom="second_pulley" sidesite="second_pulley_top"/>
+            <site site="carriage_top"/>
+        </spatial>
+    </tendon>
+
+    <equality>
+        <connect site1="guide_point_center" site2="first_pulley_center"/>
+        <connect site1="guide_point_center" site2="second_pulley_center"/>
+        <weld site1="carriage" site2="carriage_attachment" torquescale="1e6"/>
+    </equality>
+
+    <actuator>
+        <motor name="left_tendon_motor" tendon="left_tendon" gear="1" ctrlrange="-1 1"/>
+        <motor name="right_tendon_motor" tendon="right_tendon" gear="1" ctrlrange="-1 1"/>
+    </actuator>
+
+    <sensor>
+        <framepos objtype="site" objname="carriage"/>
+    </sensor>
+</mujoco>

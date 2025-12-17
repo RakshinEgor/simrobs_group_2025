@@ -1,0 +1,89 @@
+\chapter{Solution}
+
+To write the equations of motion, we begin by deriving the Lagrangian for the system, $L$, as the difference between the kinetic and potential energy of the system
+\[
+L = K - P
+\]
+where $K$ is the kinetic energy and $P$ is the potential energy of the system.
+\[
+K = \frac{1}{2}m\omega^2 = \frac{1}{2} m l^2 \dot{\theta}^2
+\]
+\[
+P = mgl(1-\cos\theta) + \frac{1}{2} k \theta^2
+\]
+
+The Lagrange's equations of motion:
+\[
+\frac{d}{dt} \left( \frac{\partial L}{\partial \dot{\theta}} \right) - \frac{\partial L}{\partial \theta} = Q,
+\]
+where $Q$ is the damping force in our case $Q = -b \dot{\theta}$
+
+Let's compute these parts of the equation: \\
+The partial derivative of $L$ in respect to $\theta$
+\[
+\frac{\partial L}{\partial \theta} = -mgl\sin\theta - k\theta
+\]
+The partial derivative of $L$ in respect to $\dot{\theta}$
+\[
+\frac{\partial L}{\partial \dot{\theta}} = ml^2\dot{\theta}
+\]
+the full time derivative
+\[
+\frac{d}{dt} \left( \frac{\partial L}{\partial \dot{\theta}} \right)
+=
+ml^2 \ddot{\theta} 
+\]
+
+Finally, the equations of motion for a pendulum-spring-damper system
+\[
+ml^2\ddot{\theta} + mgl\sin\theta + k\theta = -b\dot{\theta}
+\]
+or it can rewritten in the next form
+\[
+\ddot{\theta} = -\frac{g}{l}\sin\theta - \frac{k}{ml^2}\theta - \frac{b}{ml^2}\dot{\theta}
+\]
+
+This differential equation is nonlinear due to the part $\sin\theta$. The equation can be linearized ($\sin\theta \approx \theta$) only if the initial angle of the pendulum is small $\theta_0 < 5 \deg$. However, in my case, the initial angle $\theta_0 \approx -90 \deg$, so we can not do it. The analytical solution is unavailable, but we can solve it using numerical methods. 
+
+
+\section{Simulation result}
+
+The simulation results show the behavior of the system in 10 second using 3 integrator methods: Forward Euler, Backward Euler and Runge-Kutta (RK4). As we can observe: 
+\begin{itemize}
+\item When the time step is small (see \ref{fig:simdt0}), 3 methods is stable 
+\item When the time step is medium (see \ref{fig:simdt1}), the Forward Euler tend to increase the amplitude of the motion. The Backward Euler decrease the amplitude of the motion. But the RK4 is still stable.
+\item When the time step is big (see \ref{fig:simdt2}), the Forward Euler become unstable.
+\end{itemize}
+
+
+\subsection{Case study with small time step (dt=0.001)}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\linewidth]{images/simdt0.001}
+\caption{Simulation result with small time step}
+\label{fig:simdt0}
+\end{figure}
+
+\subsection{Case study with medium time step (dt=0.01)}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\linewidth]{images/simdt0.01}
+\caption{Simulation result with medium time step}
+\label{fig:simdt1}
+\end{figure}
+
+\subsection{Case study with large time step (dt=0.1)}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\linewidth]{images/simdt0.1}
+\caption{Simulation result with large time step}
+\label{fig:simdt2}
+\end{figure}
+
+\chapter{Conclusion}
+
+In this lab, we have derive the equation of motion for a pendulum-spring-damping system using Lagrangian method. Then we conduct the simulation using 3 different integrator methods with different time step. The result shows that method RK4 is the most stable and accurate.   
+
+
+
+

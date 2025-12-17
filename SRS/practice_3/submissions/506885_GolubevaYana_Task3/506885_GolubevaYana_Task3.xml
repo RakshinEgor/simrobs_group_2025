@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+    <option timestep="1e-4"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10"/>
+        <geom type="plane" size="1 1 0.1" material="grid"/>
+        
+        <camera name="side view" pos="1 -2 1" euler="60 0 30" fovy="60"/>
+        <camera name="front view" pos="0 -2 1" euler="0 0 0"/>
+
+         <!-- Неподвижный блок -->
+          
+            <body name="base" pos="0 0 0.75">
+            <geom type="box" size="0.01 0.01 0.05" rgba="0.8 0.3 0.3 1"/>
+            <site name="top_attachment_0" pos="0 0 0.035" size="0.001" rgba="1 0 0 1"/>
+            <site name="middle_attachment_0" pos="0 0 0" size="0.001" rgba="0 1 0 1"/>
+            <site name="bottom_attachment_0" pos="0 0 -0.035" size="0.001" rgba="0 0 1 1"/>
+            </body>
+
+            <!-- Звено R1 -->
+
+            <body name="R1" pos="0 0.076 0.75">
+            <geom name="R1_geom" type="sphere" size="0.035" rgba="0.8 0.3 0.3 1"/>
+            <joint name="R1_joint" type="slide" axis="0 0 1" range="-0.05 0.05"/>
+            <site name="top_attachment_1" pos="0 0 0.035" size="0.001" rgba="1 0 0 1"/>
+            <site name="middle_attachment_1" pos="0 0 0" size="0.001" rgba="0 1 0 1"/>
+            <site name="bottom_attachment_1" pos="0 0 -0.035" size="0.001" rgba="0 0 1 1"/>
+            </body>
+
+            <!-- Звено R2 -->
+
+            <body name="R2" pos="0 0.174 0.75">
+            <geom name="R2_geom" type="sphere" size="0.032" rgba="0.8 0.3 0.3 1"/>
+            <joint name="R2_joint" type="slide" axis="0 0 1" range="-0.10 0.10"/>
+            <site name="top_attachment_2" pos="0 0 0.032" size="0.001" rgba="1 0 0 1"/>
+            <site name="middle_attachment_2" pos="0 0 0" size="0.001" rgba="0 1 0 1"/>
+            <site name="bottom_attachment_2" pos="0 0 -0.032" size="0.001" rgba="0 0 1 1"/>
+            </body>
+
+            <body name="S" pos="0 0.223 0.75">
+            <joint name="vertical_joint" type="slide" axis="0 0 1" range="-0.1 0.1"/>
+            <geom type="box" size="0.01 0.01 0.05" rgba="0.8 0.3 0.3 1" mass="0.001"/>
+            <site name="top_attachment_00" pos="0 0 0.032" size="0.001" rgba="1 0 0 1"/>
+            <site name="middle_attachment_00" pos="0 0 0" size="0.001" rgba="0 1 0 1"/>
+            <site name="bottom_attachment_00" pos="0 0 -0.032" size="0.001" rgba="0 0 1 1"/>
+            </body>
+            
+    </worldbody>
+
+      <!-- СУХОЖИЛИЯ -->
+
+    <tendon>
+        <spatial name="a">
+            <site site="middle_attachment_0"/>
+            <site site="middle_attachment_1"/>
+        </spatial>
+
+        <spatial name="b">
+            <site site="middle_attachment_1"/>
+            <site site="middle_attachment_2"/>
+        </spatial>
+
+         <spatial name="c">
+            <site site="middle_attachment_2"/>
+            <site site="middle_attachment_00"/>
+        </spatial>
+        
+        <spatial name="tendon2">
+            <site site="top_attachment_0"/>
+            <site site="top_attachment_1"/>
+            <site site="bottom_attachment_2"/>
+            <site site="bottom_attachment_00"/>
+        </spatial>
+
+        <spatial name="tendon3">
+            <site site="bottom_attachment_0"/>
+            <site site="bottom_attachment_1"/>
+            <site site="top_attachment_2"/>
+            <site site="top_attachment_00"/>
+        </spatial>
+
+    </tendon>
+
+        <!-- МЫШЦЫ -->
+
+    <actuator>
+
+        <muscle name="lift_muscle" tendon="tendon2" ctrlrange="0 1" force="100" lengthrange="0.2 0.5"/>
+        <muscle name="lower_muscle" tendon="tendon3" ctrlrange="0 1" force="100" lengthrange="0.2 0.5"/>
+
+    </actuator>
+</mujoco>
