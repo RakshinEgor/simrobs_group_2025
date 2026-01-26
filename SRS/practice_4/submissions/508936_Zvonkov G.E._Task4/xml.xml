@@ -1,0 +1,122 @@
+ <?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+<!-- Параметры 2R механизма  -->
+R1, m	R2, m	a, m	b, m	c, m
+0.045	0.023	0.052	0.084	0.053
+
+    <option timestep="1e-4"/>
+    <option integrator="RK4"/>
+    <option gravity="0 0 -9.8"/>
+<!-- Настройки сцены -->
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.85 0.9 1"  rgb2="0.65 0.7 0.8"  width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+        <material name="init_mat" rgba="0.85 0.85 0.85 1"/>
+        <material name="bright_blue" rgba="0.2 0.6 1 1"/>
+    </asset>
+<!-- Создание Объектов -->
+    <worldbody>
+        <light pos="0 0 10"/> 
+        <geom type="plane" size="0.5 0.5 0.1" material="grid" pos = "0 0 -0.5"/>
+        <camera name="side view" pos="0.1 -1.5 1.0" euler="0 90 0" fovy="60"/>
+        <camera name="upper view" pos="0 0 1.5" euler="0 0 0"/>
+        <!-- Начальная плоскость -->
+        <body name="Init" pos="0 0 0" euler="0 90 0">
+            <geom type="box" size=" 0.05  0.01 0.002" material="bright_blue"/>    
+            <site name="Tendon1_pos" pos="0.0225 0 0" type="sphere" size="0.001"/>
+            <site name="Tendon2_pos" pos="-0.0225 0 0" type="sphere" size="0.001"/>    
+        </body>  
+        <!-- Создание объекта для удержания каретки в горизантальном положении -->
+        <body name="carriage_vertical" pos="0.189 0 0">
+            <site name="carriage_weld" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="cv_x" type="slide" axis="1 0 0"/>
+            <joint name="cv_y" type="slide" axis="0 0 1"/>
+            <geom type="box" size="0.0002 0.0002 0.0002 " mass="0.01" contype="0"/>
+        </body>
+        <!-- Создание вложенных объектов, описывающих систему 2R механизма-->
+        <!-- Первое звено -->
+        <body name = "Link1" pos = '0 0 0' euler = '0 0 0'>    
+            <geom type = "cylinder" pos = "0.026 0 0" euler = "0 90 0" mass = "0.01" size="0.002 0.026" rgba="0 0 1 0.5"/>
+            <!-- Второе звено -->
+            <body name = "Link2" pos = '0.052 0 0' euler = '0 0 0'>
+                <joint name="A" type="hinge" axis="0 1 0" stiffness="0.1"  damping="0.5"/> 
+                <geom type="cylinder" mass = "0.01"   pos="0.0265 0 0" size="0.002 0.0265" euler="0 90 0" rgba="0 0 1 0.5"/>
+                <!-- Блок цилиндр 1 -->
+                <geom name="Block1" type="cylinder" size="0.0225 0.01" pos="0 0 0" euler="90 0 0" rgba="1 0.5 0 0.5" mass = "0.001" />
+                <site name="Tendon2_b1" pos="0 0 -0.022515" type="sphere" size="0.001"/>
+                <site name="Tendon1_b1" pos="0 0 0.022515" type="sphere" size="0.001"/>
+                <site name="SB1" pos="0 0 0" type="sphere" size="0.001"/>
+                <!-- Третье звено -->
+                <body name = "Link3" pos = '0.053 0 0' euler = '0 0 0'>
+                    <!-- #Создаем Joint -->
+                    <joint name="B" type="hinge" axis="0 1 0" stiffness="0.1" damping="0.5" />
+                    <geom type="cylinder" pos="0.042 0 0" size="0.002 0.042" euler="0 90 0" rgba="0 0 1 0.5" mass = "0.01"  />
+                    <!-- Блок цилиндр 2 -->
+                    <geom name="Block2" type="cylinder" size="0.0115 0.01" pos="0 0 0" euler = "90 0 0" mass = "0.01"  rgba="1 0.5 0 0.5"/>
+                    <site name="Tendon1_b2" pos="0 0 0.01150001" type="sphere" size="0.001"/>
+                    <site name="Tendon2_b2" pos="0 0 -0.01150001" type="sphere" size="0.001"/>
+                    <site name="SB2" pos="0 0 0" type="sphere" size="0.001"/>
+                    <site name="carriage" pos="0.084 0 0" type="sphere" size="0.001"/>
+                    <!-- #Создаем Каретку -->
+                    <body name = "Carriage" pos = '0.084 0 0' euler = '0 0 0'>
+                        <geom type="box" size="0.002 0.002 0.0115" pos="0 0 0" rgba="0.9 0.9 0.9 0.5" mass = "0.01"/>
+                        <!-- #Добавляем sites для тендонов каретки-->
+                        <site name="Tendon1_end" pos="0 0 0.0115" type="sphere" size="0.001"/>
+                        <site name="Tendon2_end" pos="0 0 -0.0115" type="sphere" size="0.001"/>
+                    </body>
+                </body>
+            </body>
+        </body>
+        <!-- Фиктивные точки для корректного построения маршрута тендона -->
+        <body name="Fictionous point1" pos="0.0785 0 0" >
+            <geom type="box" size="0.00001 0.0001 0.0001" contype="0" mass = "0.001"/>
+            <site name="FP1" pos="0 0 0" type="cylinder" size="0.0001 0.00001"/>
+            <joint name="F1x" type="slide" axis="1 0 0"/>
+            <joint name="F1y" type="slide" axis="0 0 1"/>
+        </body>
+     </worldbody>
+    <!-- Тендон красный -->
+     <tendon>
+        <spatial name = "Tendon1" width = "0.001" stiffness = "10" damping = "2" springlength = "0.005" rgba="1 0 0 1">
+            <site site = "Tendon2_pos"/> 
+            <geom geom="Block1" sidesite="Tendon1_b1"/>
+            <site site = "FP1"/>
+            <geom geom="Block2" sidesite="Tendon2_b2"/>
+            <site site="Tendon2_end"/>
+        </spatial>
+        
+    </tendon>
+        <!-- Тендон зелёный -->
+       <tendon>
+        <spatial name = "Tendon2" width = "0.001" stiffness = "10" damping = "2" springlength = "0.005" rgba="0 1 0 1">
+            <site site = "Tendon1_pos"/> 
+            <geom geom="Block1" sidesite="Tendon2_b1"/>
+            <site site = "FP1"/>
+            <geom geom="Block2" sidesite="Tendon1_b2"/>
+            <site site="Tendon1_end"/>
+        </spatial>
+
+    </tendon>
+        <!-- Ограничение удерживаающее каретку в горизантальном положении -->
+       <equality>
+            <connect site1="FP1" site2="SB1"/>
+            <connect site1="FP1" site2="SB2"/>
+        </equality>
+            <!-- Привоода тендонов -->
+
+        <actuator>
+            <motor name="motor_t1" joint="A" gear="3" />
+            <motor name="motor_t2" joint="B" gear="3" />
+        </actuator>
+        
+        <sensor>
+            <framepos objtype="site" objname="carriage"/>
+             <!-- Сенсоры позиции тендонов -->
+            <jointpos joint="A" name="q1"/>
+            <jointvel joint="A" name="dq1"/>
+            <jointpos joint="B" name="q2"/>
+            <jointvel joint="B" name="dq2"/>
+        </sensor>
+
+</mujoco>
