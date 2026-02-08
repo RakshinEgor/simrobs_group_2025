@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<mujoco>
+    <option timestep="1e-4" integrator="RK4" gravity="0 0 0"/>
+
+    <default>
+        <joint damping="0.001"/>
+    </default>
+
+    <worldbody>
+        <light pos="0 0 3" dir="0 0 -1"/>
+        <geom type="plane" size="1 1 0.1" rgba=".9 0 0 1"/>
+
+        <body name="mid1" pos="0.063 0 0.1">
+            <site name="mid1_site" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="mid1_x" type="slide" axis="1 0 0"/>
+            <joint name="mid1_z" type="slide" axis="0 0 1"/>
+            <geom type="sphere" size="0.002" rgba="1 0 0 1"/>
+        </body>
+
+        <body name="mid2" pos="0.063 0 0.1">
+            <site name="mid2_site" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="mid2_x" type="slide" axis="1 0 0"/>
+            <joint name="mid2_z" type="slide" axis="0 0 1"/>
+            <geom type="sphere" size="0.002" rgba="0 1 0 1"/>
+        </body>
+
+        <body name="base" pos="0 0 0.1">
+            <geom type="cylinder" size=".0005 .005" rgba=".8 .3 .3 1"/>
+            <site name="anchor1a" pos="0 0 0.005" type="sphere" size="0.002"/>
+            <site name="anchor1b" pos="0 0 -0.005" type="sphere" size="0.002"/>
+            <body name="link1" pos="0 0 0">
+                <geom name="link1_geom" type="cylinder" size=".0005 .0185" fromto="0 0 0 0.037 0 0" rgba=".8 .3 .3 1" contype="0" conaffinity="0"/> 
+                <body name="link2" pos="0.037 0 0">
+                    <joint name="joint1" type="hinge" axis="0 1 0" pos="0 0 0"/>
+                    <geom name="link2_geom" type="cylinder" size=".0005 0.026" fromto="0 0 0 0.052 0 0" rgba=".3 .8 .3 1" contype="0" conaffinity="0"/>
+                    <geom name="cyl1" type="cylinder" size=".005 .005" euler="90 0 0" rgba=".3 .3 .3 0.5"/>
+                    <site name="wrap1a" pos="0 0 0.01" type="sphere" size="0.001"/>
+                    <site name="wrap1b" pos="0 0 -0.01" type="sphere" size="0.001"/>
+                    <site name="center1" pos="0 0 0" type="sphere" size="0.001"/>   
+                    <body name="link3" pos="0.052 0 0">
+                        <joint name="joint2" type="hinge" axis="0 1 0" pos="0 0 0"/>
+                        <geom name="link3_geom" type="cylinder" size=".0005 .005" fromto="0 0 0 0.045 0 0" rgba=".3 .3 .8 1" contype="0" conaffinity="0"/>
+                        <geom name="cyl2" type="cylinder" size=".013 .005" euler="90 0 0" rgba=".3 .3 .3 0.5"/>
+                        <site name="wrap2a" pos="0 0 0.017" type="sphere" size="0.001"/>
+                        <site name="wrap2b" pos="0 0 -0.017" type="sphere" size="0.001"/>
+                        <site name="center2" pos="0 0 0" type="sphere" size="0.001"/>
+                        <body name="end_effector" pos="0.045 0 0">
+                            <geom type="cylinder" size=".0005 .013" rgba=".3 .3 .8 1"/>
+                            <site name="anchor2a" pos="0 0 .013" type="sphere" size="0.002"/>
+                            <site name="anchor2b" pos="0 0 -.013" type="sphere" size="0.002"/>
+                            <site name="end_effector" pos="0 0 0" type="sphere" size="0.001"/>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <tendon>
+        <spatial name="spring1" width="0.001" rgba="1 0 0 1" stiffness="50" damping="10">
+            <site site="anchor1a"/>
+            <geom geom="cyl1" sidesite="wrap1a"/>
+            <site site="mid1_site"/>
+            <geom geom="cyl2" sidesite="wrap2b"/>
+            <site site="anchor2b"/>
+        </spatial>
+        
+        <spatial name="spring2" width="0.001" rgba="0 1 0 1" stiffness="50" damping="10">
+            <site site="anchor1b"/>
+            <geom geom="cyl1" sidesite="wrap1b"/>
+            <site site="mid2_site"/>
+            <geom geom="cyl2" sidesite="wrap2a"/>
+            <site site="anchor2a"/>
+        </spatial>
+    </tendon>
+
+    <equality>
+        <connect site1="mid1_site" site2="center1"/>
+        <connect site1="mid1_site" site2="center2"/>
+        <connect site1="mid2_site" site2="center1"/>
+        <connect site1="mid2_site" site2="center2"/>
+    </equality>
+
+    <actuator>
+        <motor name="motor_q1" joint="joint1" gear="1"/>
+        <motor name="motor_q2" joint="joint2" gear="1"/>
+    </actuator>
+
+    <sensor>
+        <jointpos name="sensor_q1" joint="joint1"/>
+        <jointvel name="sensor_q1_vel" joint="joint1"/>
+        <jointpos name="sensor_q2" joint="joint2"/>
+        <jointvel name="sensor_q2_vel" joint="joint2"/>
+    </sensor>
+</mujoco>
