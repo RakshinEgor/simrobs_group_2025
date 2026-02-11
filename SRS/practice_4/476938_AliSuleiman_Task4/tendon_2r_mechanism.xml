@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<mujoco model="2R_tendon_planar">
+    <option timestep="1e-4"/>
+    <option integrator="RK4"/>
+    <option gravity="0 0 0"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 10"/>
+
+        <camera name="side view" pos="0.1 -1.5 1.0" euler="90 0 0" fovy="60"/>
+        <camera name="upper view" pos="0 0 1.5" euler="0 0 0"/>
+
+        <body name="wall" pos="0 0 0" euler="0 90 0">
+            <geom type="plane" size="0.05 0.05 0.01" material="grid"/>
+            <site name="t1_wall" pos="0.007 0 0" type="sphere" size="0.002"/>
+            <site name="t2_wall" pos="-0.007 0 0" type="sphere" size="0.002"/>
+        </body>
+
+        <body name="mid_body_t1" pos="0.099 0 0">
+            <site name="t1_mid" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="mid_joint_x_t1" type="slide" axis="1 0 0"/>
+            <joint name="mid_joint_y_t1" type="slide" axis="0 0 1"/>
+            <geom type="sphere" size="0.002" mass="0.0001" rgba="1.00 0.00 0.00 0.5" contype="0"/>
+        </body>
+
+        <body name="mid_body_t2" pos="0.099 0 0">
+            <site name="t2_mid" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="mid_joint_x_t2" type="slide" axis="1 0 0"/>
+            <joint name="mid_joint_y_t2" type="slide" axis="0 0 1"/>
+            <geom type="sphere" size="0.002" mass="0.0001" rgba="0.00 1.00 0.00 0.5" contype="0"/>
+        </body>
+
+        <body name="effector_link" pos="0.219 0 0">
+            <site name="effector_world" pos="0 0 0" type="sphere" size="0.001"/>
+            <joint name="effector_x" type="slide" axis="1 0 0"/>
+            <joint name="effector_y" type="slide" axis="0 0 1"/>
+            <geom type="sphere" size="0.002" mass="0.0001" rgba="0.86 0.43 0.54 0.5" contype="0"/>
+        </body>
+
+        <body name="link1" pos="0 0 0" euler="0 0 0">         
+            <geom type="cylinder" pos="0.026 0 0" size="0.002 0.026" euler="0 90 0" rgba="0.9 0.1 0.1 0.8" contype="0"/>
+
+            <body name="link2" pos="0.052 0 0" euler="0 0 0">
+                <joint name="A" type="hinge" axis="0 1 0" stiffness="0" springref="0" damping="0"/>     
+                <geom type="cylinder" pos="0.047 0 0" size="0.002 0.047" euler="0 90 0" rgba="0.1 0.7 0.1 0.8" contype="0"/>
+
+                <geom name="pulley1" type="cylinder" size="0.007 0.001" pos="0 0 0" euler="90 0 0" rgba="0.8 0.8 0.2 0.9" contype="0"/>
+                <site name="side_r1_t1" pos="0 0 -0.009" type="sphere" size="0.001"/>
+                <site name="side_r1_t2" pos="0 0 0.009" type="sphere" size="0.001"/>
+                <site name="pulley1_side" pos="0 0 0" type="sphere" size="0.001"/>
+
+                <body name="link3" pos="0.094 0 0" euler="0 0 0">
+                    <joint name="B" type="hinge" axis="0 1 0" stiffness="0" springref="0" damping="0"/>     
+                    <geom type="cylinder" pos="0.0365 0 0" size="0.002 0.0365" euler="0 90 0" rgba="0.1 0.1 0.9 0.8" contype="0"/>
+                    <geom type="box" pos="0.073 0 0" size="0.002 0.002 0.011" rgba="0.1 0.1 0.9 0.8" mass="0" contype="0"/>
+
+                    <site name="t1_end" pos="0.073 0 0.011" type="sphere" size="0.002"/>
+                    <site name="t2_end" pos="0.073 0 -0.011" type="sphere" size="0.002"/>
+
+                    <geom name="pulley2" type="cylinder" size="0.011 0.001" pos="0 0 0" euler="90 0 0" rgba="0.9 0.6 0.1 0.9" contype="0"/>
+                    <site name="side_r2_t1" pos="0 0 0.013" type="sphere" size="0.001"/>
+                    <site name="side_r2_t2" pos="0 0 -0.013" type="sphere" size="0.001"/>
+                    <site name="pulley2_side" pos="0 0 0" type="sphere" size="0.001"/>
+
+                    <site name="effector" pos="0.073 0 0" type="sphere" size="0.001"/>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <!-- Position actuators for joints A and B with PD control -->
+        <position name="motor_A" joint="A" kp="500" kv="50" ctrllimited="true" ctrlrange="-1.57 1.57"/>
+        <position name="motor_B" joint="B" kp="500" kv="50" ctrllimited="true" ctrlrange="-1.57 1.57"/>
+    </actuator>
+
+    <sensor>
+        <!-- Joint position and velocity sensors -->
+        <jointpos name="joint_A_pos" joint="A"/>
+        <jointvel name="joint_A_vel" joint="A"/>
+        <jointpos name="joint_B_pos" joint="B"/>
+        <jointvel name="joint_B_vel" joint="B"/>
+        
+        <!-- Actuator force sensors -->
+        <actuatorfrc name="motor_A_force" actuator="motor_A"/>
+        <actuatorfrc name="motor_B_force" actuator="motor_B"/>
+        
+        <!-- End effector position sensor -->
+        <framepos name="effector_pos" objtype="site" objname="effector"/>
+        
+        <!-- Site position sensors for tendon attachment points -->
+        <framepos name="t1_wall_pos" objtype="site" objname="t1_wall"/>
+        <framepos name="t2_wall_pos" objtype="site" objname="t2_wall"/>
+        <framepos name="t1_end_pos" objtype="site" objname="t1_end"/>
+        <framepos name="t2_end_pos" objtype="site" objname="t2_end"/>
+    </sensor>
+
+    <tendon>
+        <spatial name="tendon1_1" width="0.001" stiffness="1000" damping="10" springlength="0.005">
+            <site site="t1_wall"/>
+            <geom geom="pulley1" sidesite="side_r1_t1"/>
+            <site site="t1_mid"/>
+            <geom geom="pulley2" sidesite="side_r2_t1"/>
+            <site site="t1_end"/>
+        </spatial>
+    </tendon>
+
+    <tendon>
+        <spatial name="tendon2_1" width="0.001" stiffness="1000" damping="10" springlength="0.005">
+            <site site="t2_wall"/>
+            <geom geom="pulley1" sidesite="side_r1_t2"/>
+            <site site="t2_mid"/>
+            <geom geom="pulley2" sidesite="side_r2_t2"/>
+            <site site="t2_end"/>
+        </spatial>
+    </tendon>
+
+    <equality>
+        <weld site1="effector" site2="effector_world" torquescale="100"/>
+
+        <connect site1="t1_mid" site2="pulley1_side"/>
+        <connect site1="t1_mid" site2="pulley2_side"/>
+        <connect site1="t2_mid" site2="pulley1_side"/>
+        <connect site1="t2_mid" site2="pulley2_side"/>
+    </equality>
+</mujoco>
