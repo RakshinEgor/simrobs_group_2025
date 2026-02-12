@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mujoco model="optimus_knee_task4">
+    <compiler angle="radian" inertiafromgeom="true"/>
+
+    <option integrator="Euler" timestep="0.001" gravity="0 0 0"/>
+
+    <visual>
+        <map znear="0.01" zfar="50"/>
+        <rgba haze="0.15 0.25 0.35 1"/>
+    </visual>
+
+    <asset>
+        <texture type="skybox" builtin="gradient"
+                 rgb1="0.3 0.5 0.7" rgb2="0 0 0"
+                 width="320" height="320"/>
+        <texture name="grid" type="2d" builtin="checker"
+                 rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6"
+                 width="300" height="300"/>
+        <material name="grid" texture="grid"
+                  texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <worldbody>
+        <light pos="0 0 2" dir="0 0 -1" diffuse="1 1 1"/>
+        <geom name="ground" type="plane" size="0.5 0.5 0.1" material="grid"/>
+
+        <site name="site_O" pos="0 0 0"       size="0.015" rgba="0.9 0.2 0.2 1"/>
+        <site name="site_C" pos="0.074 0 0"   size="0.015" rgba="0.9 0.2 0.2 1"/>
+        <site name="site_D" pos="0.444 0 0"   size="0.015" rgba="0.9 0.2 0.2 1"/>
+
+        <body name="L1_body" pos="0 0 0">
+            <inertial pos="0 0 0.037" mass="0.2"
+                      diaginertia="0.01 0.01 0.001"/>
+            <joint name="J_O" type="hinge" axis="0 1 0"
+                   limited="true" range="-1e-6 1e-6" damping="0.5"/>
+            <geom name="G_L1" type="capsule"
+                  fromto="0 0 0   -0.0142133 0 0.0726222"
+                  size="0.01" rgba="0.21 0.32 0.82 0.9"/>
+
+            <body name="L2_body" pos="-0.0142133 0 0.0726222">
+                <inertial pos="0 0 0.0481" mass="0.2"
+                          diaginertia="0.01 0.01 0.001"/>
+                <joint name="J_A" type="hinge" axis="0 1 0"
+                       limited="true" range="-2.5 2.5" damping="0.5"/>
+                <geom name="G_L2" type="capsule"
+                      fromto="0 0 0   0.0882133 0 0.0383778"
+                      size="0.01" rgba="0.21 0.32 0.82 0.9"/>
+
+                <body name="B_body" pos="0.0882133 0 0.0383778">
+                    <site name="site_B" pos="0 0 0"
+                          size="0.015" rgba="0.2 0.3 0.9 1"/>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <tendon>
+        <spatial name="tendon_BC" width="0.008"
+                 rgba="0.8 0.8 0.2 1"
+                 stiffness="0.0"
+                 damping="0.0"
+                 springlength="0.111">
+            <site site="site_B"/>
+            <site site="site_C"/>
+        </spatial>
+
+        <spatial name="tendon_BD" width="0.008"
+                 rgba="0.2 0.8 0.8 1"
+                 limited="false">
+            <site site="site_B"/>
+            <site site="site_D"/>
+        </spatial>
+    </tendon>
+
+    <actuator>
+        <motor name="q1_motor" joint="J_A" gear="1"
+               ctrllimited="true" ctrlrange="-20 20"/>
+    </actuator>
+
+    <sensor>
+        <jointpos name="q1_pos" joint="J_A"/>
+        <jointvel name="q1_vel" joint="J_A"/>
+    </sensor>
+
+</mujoco>
