@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<mujoco>
+    <option timestep="0.001"/>
+    <option gravity="0 0 -9.8"/>
+    
+    <worldbody>
+        <light pos="0 0 2"/>
+        <geom name="ground" type="plane" size="1 1 0.1" rgba="0.8 0.9 0.8 1"/>
+        <camera name="fixed" pos="0 -1.5 0.5" xyaxes="1 0 0 0 1 1"/>
+        
+        <!-- Левый базовый блок (неподвижный) -->
+        <body name="base_O1" pos="0 0 0.1">
+            <geom type="box" size="0.001 0.05 0.1" rgba="0.3 0.3 0.3 1"/>
+            <site name="tendon1_start_top" pos="0.002 0 0.045" rgba="1 0.5 0 1" size="0.005"/>
+            <site name="tendon2_start_bottom" pos="0.002 0 -0.045" rgba="0.5 0 1 1" size="0.005"/>
+        </body>
+
+        <!-- Первый шкив - ПОДВИЖНЫЙ по Z и ВРАЩАЕМЫЙ -->
+        <body name="pulley1" pos="0.144 0 0.1">
+            <joint name="joint1_slide" type="slide" axis="0 0 1" range="-0.05 0.05" damping="0.5"/>
+            <joint name="joint1_rotate" type="hinge" axis="0 1 0" damping="0.3"/>
+            <geom type="cylinder" size="0.045 0.01" rgba="1 0 0 0.7" euler="90 0 0" mass="0.2"/>
+            <site name="pulley1_top" pos="0 0 0.045" rgba="1 0.5 0 1" size="0.005"/>
+            <site name="pulley1_bottom" pos="0 0 -0.045" rgba="0.5 0 1 1" size="0.005"/>
+        </body>
+
+        <!-- Второй шкив - ПОДВИЖНЫЙ по Z и ВРАЩАЕМЫЙ -->
+        <body name="pulley2" pos="0.3 0 0.1">
+            <joint name="joint2_slide" type="slide" axis="0 0 1" range="-0.05 0.05" damping="0.5"/>
+            <joint name="joint2_rotate" type="hinge" axis="0 1 0" damping="0.3"/>
+            <geom type="cylinder" size="0.039 0.01" rgba="0 0.8 0 0.7" euler="90 0 0" mass="0.15"/>
+            <site name="pulley2_top" pos="0 0 0.039" rgba="0.5 0 1 1" size="0.005"/>
+            <site name="pulley2_bottom" pos="0 0 -0.039" rgba="1 0.5 0 1" size="0.005"/>
+        </body>
+
+        <!-- Правый базовый блок (ПОДВИЖНЫЙ) -->
+        <body name="base_O2" pos="0.389 0 0.1">
+            <joint name="base_slide" type="slide" axis="0 0 1" range="0 0.2" damping="1.0"/>
+            <geom type="box" size="0.001 0.05 0.1" rgba="0.3 0.3 0.3 1" mass="1.5"/>
+            <site name="tendon1_end_bottom" pos="0.001 0 -0.039" rgba="1 0.5 0 1" size="0.005"/>
+            <site name="tendon2_end_top" pos="0.001 0 0.039" rgba="0.5 0 1 1" size="0.005"/>
+        </body>
+    </worldbody>
+
+    <tendon>
+        <!-- Тендоны со средней жесткостью -->
+        <spatial name="tendon1" limited="true" range="0.3 0.7" width="0.004" 
+                 stiffness="15000" damping="30" rgba="1 0.5 0 1">
+            <site site="tendon1_start_top"/>
+            <site site="pulley1_top"/>
+            <site site="pulley2_bottom"/>
+            <site site="tendon1_end_bottom"/>
+        </spatial>
+        
+        <spatial name="tendon2" limited="true" range="0.3 0.7" width="0.004" 
+                 stiffness="15000" damping="30" rgba="0.5 0 1 1">
+            <site site="tendon2_start_bottom"/>
+            <site site="pulley1_bottom"/>
+            <site site="pulley2_top"/>
+            <site site="tendon2_end_top"/>
+        </spatial>
+    </tendon>
+
+    <actuator>
+        <!-- ДВА ПРИВОДА для вращения шкивов -->
+        <motor name="q1_motor" joint="joint1_rotate" gear="100" ctrllimited="true" ctrlrange="-8 8"/>
+        <motor name="q2_motor" joint="joint2_rotate" gear="100" ctrllimited="true" ctrlrange="-8 8"/>
+        
+        <!-- Мягкие пружины для высоты шкивов (позволяют двигаться) -->
+        <motor name="pulley1_height" joint="joint1_slide" gear="20" ctrllimited="true" ctrlrange="-10 10"/>
+        <motor name="pulley2_height" joint="joint2_slide" gear="20" ctrllimited="true" ctrlrange="-10 10"/>
+    </actuator>
+
+    <sensor>
+        <jointpos name="q1_position" joint="joint1_rotate"/>
+        <jointvel name="q1_velocity" joint="joint1_rotate"/>
+        <jointpos name="q2_position" joint="joint2_rotate"/>
+        <jointvel name="q2_velocity" joint="joint2_rotate"/>
+        <jointpos name="pulley1_height" joint="joint1_slide"/>
+        <jointpos name="pulley2_height" joint="joint2_slide"/>
+        <jointpos name="base_position" joint="base_slide"/>
+        <tendonpos name="tendon1_length" tendon="tendon1"/>
+        <tendonpos name="tendon2_length" tendon="tendon2"/>
+    </sensor>
+
+    <equality>
+        <!-- Слабые пружины для стабилизации высоты шкивов -->
+        <joint name="pulley1_height_spring" joint1="joint1_slide" polycoef="0 50 0 0"/>
+        <joint name="pulley2_height_spring" joint1="joint2_slide" polycoef="0 40 0 0"/>
+    </equality>
+</mujoco>
