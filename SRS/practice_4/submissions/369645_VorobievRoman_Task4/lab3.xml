@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<mujoco>
+
+	<option timestep="1e-4"/>
+	<option gravity="0 0 -9.8"/>
+
+	<asset>
+		<texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+		<texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+		<material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+	</asset>
+
+	<worldbody>
+		<light pos="0 0 10"/>
+		<geom type="plane" size="0.5 0.5 0.1" material="grid"/>
+
+		<camera name="side view" pos="0.1 -1.5 1.0" euler="90 0 0" fovy="60"/>
+		<camera name="upper view" pos="0 0 1.5" euler="0 0 0"/>
+
+		<body name="OAB" pos="0 0 0.005" euler="90 0 0">
+
+			<joint name="O" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0"/>
+			<geom name="point O" type="cylinder" pos="0 0 0" size="0.005 0.005" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+			<geom name="link OA" type="cylinder" pos="0 0.026 0" size="0.005 0.026" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+			<site name="sA" size="0.006" pos="0 0 0"/>
+
+			<body name="AB" pos="0 0.052 0" euler="0 0 0">
+				<joint name="A" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0"/>
+				<geom name="point A" type="cylinder" pos="0 0 0" size="0.005 0.005" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+				<geom name="link AB" type="cylinder" pos="0 0.0338 0" size="0.005 0.0338" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+				<site name="sB1" size="0.006" pos="0 0.0676 0"/>	
+			</body>
+		</body>
+
+		<body name="CB" pos="0.052 0 0.005" euler="90 0 0">
+			<joint name="C" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0"/>
+			<geom name="point C" type="cylinder" pos="0 0 0" size="0.005 0.005" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+			<geom name="link CB" type="cylinder" pos="0 0.039 0" size="0.005 0.039" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+			<site name="sB2" size="0.006" pos="0 0.078 0"/>
+		</body>
+
+		<body name="DSB" pos="0.312 0 0.005" euler="90 0 0">
+			<joint name="D" type="hinge" axis="0 0 1" stiffness="0" springref="0" damping="0"/>
+			<geom name="point D" type="cylinder" pos="0 0 0" size="0.005 0.005" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+			<geom name="link DS" type="cylinder" pos="0 0.09 0" size="0.005 0.09" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+
+			<body name="SB" pos="0 0.17 0" euler="0 0 0">
+				<joint name="S" type="slide" axis="0 1 0" range="-0.12 0.12"/>
+				<geom name="link SB" type="cylinder" pos="0 0.06 0" size="0.005 0.06" rgba="0.21 0.32 0.82 0.5" euler="90 0 0" contype="0"/>
+				<site name="sB3" size="0.006" pos="0 0.12 0"/>
+			</body>
+		</body>
+	</worldbody>
+	
+	<equality>
+		<connect site1="sB1" site2="sB2"/>
+		<connect site1="sB1" site2="sB3"/>
+	</equality>
+	
+	<actuator>
+		<position name="O" joint="O"/>
+	</actuator>
+	<sensor>
+		<framepos objtype="site" objname="sA"/>
+	</sensor>
+</mujoco>
