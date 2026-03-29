@@ -1,0 +1,181 @@
+\documentclass[a4paper,14pt,oneside,openany]{memoir}
+
+%%% Set margins, indents, and linespread %%%
+
+\usepackage[left=30mm, right=15mm, top=20mm, bottom=20mm]{geometry} % Package arguments define page margins
+\pagestyle{plain} % Remove default upper header and leave only a page number at the bottom center of the page
+\parindent=1.25cm % First line indent 1.25 cm, approximately equal to 5 characters (as required by GOST)
+\usepackage{indentfirst} % Add indent to the first paragraph
+%\linespread{1.3} % Linespread (the closest to 1.5 in Word) - here we use a command OnehalfSpacing* later
+
+%%% Set language parameters and font %%%
+
+\usepackage[english]{babel}                         % English is the only language for the document
+\babelfont{rm}{Times New Roman}                     % TMR as the primary font
+
+%%% Set heading style for chapters, sections, and subsections %%%
+
+\setsecnumdepth{subsection} % Numbers are only assigned to the first three levels, i.e., numbered are chapters, sections, and subsections
+\renewcommand*{\chapterheadstart}{} % Redefine the command which adds spacing above the heading to prevent it from doing this
+\renewcommand*{\printchaptername}{} % Redefine the command which prints the word 'Chapter' to prevent it from doing this
+%\renewcommand*{\printchapternum}{} % Same for the chapter number - no, here we need to keep the number
+\renewcommand*{\chapnumfont}{\normalfont\bfseries} % Change the chapter number font style: normal size, bold
+\renewcommand*{\afterchapternum}{\hspace{1em}} % Change the delimiter between the chapter number and the chapter title
+\renewcommand*{\printchaptertitle}{\normalfont\bfseries\centering\MakeUppercase} % Change the chapter title font style: normal size, bold, centered, uppercase
+\setbeforesecskip{20pt} % Set spacing above the section heading 
+\setaftersecskip{20pt} % Same spacing below the section heading
+\setsecheadstyle{\raggedright\normalfont\bfseries} % Change the section heading font style: right aligned, normal size, bold
+\setbeforesubsecskip{20pt} % Set spacing above the subsection heading
+\setaftersubsecskip{20pt} % Same spacing below the subsection heading
+\setsubsecheadstyle{\raggedright\normalfont\bfseries}  % Change the subsection heading font style: right aligned, normal size, bold
+
+%%% Set toc parameters %%%
+
+\setrmarg{2.55em plus1fil} % Disable hyphenation in toc
+%\setlength{\cftbeforechapterskip}{0pt} % This command removes vertical spacing before chapter titles - no, keep the spacing
+\renewcommand{\aftertoctitle}{\afterchaptertitle \vspace{-\cftbeforechapterskip}} % Adjust vertical spacing right after the heading 'Table of Contents' to make it the same as for other chapter headings
+%\renewcommand*{\chapternumberline}[1]{} % Redefine the command which prints the chapter number to prevent it from doing this - no, keep the number here
+\renewcommand*{\cftchapternumwidth}{1.5em} % Change the delimiter between the chapter number and the chapter title
+\renewcommand*{\cftchapterfont}{\normalfont\MakeUppercase} % Chapter titles are printed with normal size, uppercase
+\renewcommand*{\cftchapterpagefont}{\normalfont} % Page numbers are printed with normal size
+\renewcommand*{\cftchapterdotsep}{\cftdotsep} % Create dot separators which go up to the page number for each entry in toc
+\renewcommand*{\cftdotsep}{1} % Define the dot frequency
+\renewcommand*{\cftchapterleader}{\cftdotfill{\cftchapterdotsep}} % Make the dots of standard shape (by default they are 'bold')
+\maxtocdepth{subsection} % Only the first three levels are displayed in toc: chapters, sections, and subsections
+
+%%% Alignment and hyphenation %%%
+
+%% http://tex.stackexchange.com/questions/241343/what-is-the-meaning-of-fussy-sloppy-emergencystretch-tolerance-hbadness
+%% http://www.latex-community.org/forum/viewtopic.php?p=70342#p70342
+\tolerance 1414
+\hbadness 1414
+\emergencystretch 1.5em                             % If something goes wrong, try to adjust this one first
+\hfuzz 0.3pt
+\vfuzz \hfuzz
+%\dbottom
+%\sloppy                                            % No overfilling
+\clubpenalty=10000                                  % Prevent page break after the first line in a paragraph
+\widowpenalty=10000                                 % Prevent page break before the last line in a paragraph
+\brokenpenalty=4991                                 % Prevent page break directly after hyphenation
+
+%%% Set parameters for figures and tables %%%
+
+\usepackage{graphicx, caption, subcaption} % Load packages for figures and captions
+\graphicspath{{images/}} % Define the image folder
+\captionsetup[figure]{font=small, width=\textwidth, name=Figure, justification=centering} % Set the figure caption parameters: small font size (12pt), caption width is equal to the width of the main text, complete word "Figure", caption is centered
+\captionsetup[subfigure]{font=small} % Subfigure indices a), b), ... are also in small size (12pt) (by default they are even smaller)
+\captionsetup[table]{singlelinecheck=false,font=small,width=\textwidth,justification=justified} % Set the table caption parameters: disable hyphenation, small font size (12pt), caption width is equal to the width of the main text, caption is justified
+\captiondelim{ --- } % Set em dash as the delimiter between the caption name (i.e., the words 'Figure' and 'Table') and caption text
+\setkeys{Gin}{width=\textwidth} % By defalut, the size of all figures will be adjusted to fit into the main text
+%\setlength{\abovecaptionskip}{0pt} % Vertical space above the caption - no, keep the default
+%\setlength{\belowcaptionskip}{0pt} % Vertical space below the caption - no, keep the default
+\usepackage[section]{placeins} % All objects of the float type (figures/tables) do not go beyond the section where they are initialized
+
+%%% Set parameters for references and hyperreferences %%%
+
+\usepackage{hyperref}                               % Load the corresponding package
+\hypersetup{
+    colorlinks=true,                                % All refs and hyperrefs appear colored in text
+    linktoc=all,                                    % Clickable colored refs for all entries in toc
+    linktocpage=true,                               % Only the page numbers will be colored in toc, not the whole titles
+    linkcolor=red,                                  % The color of refs and hyperrefs is red
+    citecolor=red                                   % The color of citations is red
+}
+
+%%% Set list parameters %%%
+
+\usepackage{enumitem}                               % Load the package for the fine adjustment of list appearance
+\renewcommand*{\labelitemi}{\normalfont{--}}        % Use en dash for unnumbered list items
+\setlist{noitemsep, leftmargin=*}                   % Remove vertical spacings between the items of the same level
+\setlist[1]{labelindent=\parindent}                 % Item indent is equal to the paragraph indent
+\setlist[2]{leftmargin=\parindent}                  % Additional indent for the 2nd level
+\setlist[3]{leftmargin=\parindent}                  % And one more for the 3rd level
+
+%%% Counters and object numbering %%%
+
+\counterwithout{figure}{chapter}                    % Continuous numbering of figures throughout the document
+\counterwithout{equation}{chapter}                  % Continuous numbering of math expressions throughout the document
+\counterwithout{table}{chapter}                     % Continuous numbering of tables throughout the document
+
+%%% Create bibliography using the biblatex package and biblatex-gost style processed by biber %%%
+
+\usepackage{csquotes} % This package manages complex citation blocks (biblatex recommends to load it)
+\usepackage[%
+backend=biber,                                      % Processor
+bibencoding=utf8,                                   % Encoding of the bib-file
+sorting=none,                                       % Preference for sorting the reference list
+style=gost-numeric,                                 % Citation style (GOST)
+language=english,                                   % English language for the reference list
+sortcites=true,                                     % Several cites in square brackets will appear sorted
+movenames=false,                                    % Do not move author names, they are always in the beginning of the citation entry
+maxnames=5,                                         % Maximum number of authors for an entry
+minnames=3,                                         % If there is more that 'max', cut the number of authors up to this
+doi=false,                                          % Do now show DOI
+isbn=false,                                         % Do not show ISBN, ISSN, ISRN
+]{biblatex}[2016/09/17]
+\DeclareDelimFormat{bibinitdelim}{}                 % Remove the space between initials (Readdler J.R. instead of Readdler J. R.)
+\addbibresource{biba.bib}                           % Define the bibliography file
+
+%%% Additional packages for enhanced functionality %%%
+
+\usepackage{longtable,ltcaption}                    % Long tables
+\usepackage{multirow,makecell}                      % Enriched formatting for tables
+\usepackage{booktabs}                               % Yet another package for nice tables
+\usepackage{soulutf8}                               % Support hyphenatable letterspacing, underline, and strikethrough
+\usepackage{hyphenat}                               % Enhanced hyphenation functionality
+\usepackage{textcomp}                               % Support for 'complex' printed signs like some currency symbols, copyright, etc.
+\usepackage[version=4]{mhchem}                      % Beautiful chemical equations
+\usepackage{amsmath}                                % Enriched appearance of mathematical expressions 
+\usepackage{float}
+%%% Subsequently add all document parts %%%
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+\begin{document}
+
+\input{1_title}                                     % Title page
+
+\newpage % Page break
+\setcounter{page}{2} % Start counting pages from number 2
+\OnehalfSpacing* % Set the line spacing to one-half (line spacing is single in the title page)
+
+\tableofcontents*                                   % Automatically build toc
+
+\input{2_intro}                                     % Introduction
+%\input{ode_solution}
+%\input{appendix}
+%\input{3_chap1}                                     % First chapter
+%\input{4_chap2}                                     % Second chapter
+%\input{5_chap3}                                     % Third chapter
+
+%\printbibliography % Automatically assemble bibliography list
+
+\end{document}
