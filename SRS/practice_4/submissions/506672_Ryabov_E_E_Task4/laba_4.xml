@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+
+	<option timestep="1e-4"/>
+	<option gravity="0 0 -9.8"/>
+
+	<asset>
+		
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+        <material name="init_mat" rgba="0.85 0.85 0.85 1"/>
+        <material name="bright_blue" rgba="0.2 0.6 1 1"/>
+		<texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+	</asset>
+	
+	<worldbody>
+		<light pos="0 0 10"/>
+        <geom type="plane" size="1 1 0.1" material="grid"/>
+		
+		
+		<body name="wall" pos="0 0 1" euler="0 90 0">
+			<geom type="plane" size="0.2 0.1 0.2" material="grid"/>
+			<site name="beginning1" pos="0.032 0 0"/>  
+			<site name="beginning2" pos="-0.032 0 0"/> 
+			<site name="end1" pos="0.021 0 0.21"/>     
+			<site name="end2" pos="-0.021 0 0.21"/>    
+		</body>
+
+		
+		<body name="R1" pos="0.032 0 1">  
+			<joint name="jointR1" type="slide" axis="0 0 1"/>
+			<geom type="ellipsoid" size="0.015 0.01 0.015"/>  
+			<site name="R1_site" pos="0 0 0"/>
+			
+			
+			<site name="corner1up" pos="0 0 0.015" size="0.0001"/>
+			<site name="corner1upleft" pos="-0.01 0 0.015" size="0.0001"/>
+			<site name="corner1upright" pos="0.01 0 0.015" size="0.0001"/>
+
+			<site name="corner1down" pos="0 0 -0.015" size="0.0001"/>
+			<site name="corner1downleft" pos="-0.01 0 -0.015" size="0.0001"/>
+			<site name="corner1downright" pos="0.01 0 -0.015" size="0.0001"/>
+		</body>
+
+		
+		<body name="R2" pos="0.132 0 1">  
+			<joint name="jointR2" type="slide" axis="0 0 1"/>
+			<geom type="ellipsoid" size="0.032 0.01 0.032"/>  
+			<site name="R2_site" pos="0 0 0"/>
+
+			
+			<site name="corner2up" pos="0 0 0.032" size="0.0001"/>
+			<site name="corner2upleft" pos="-0.01 0 0.032" size="0.0001"/>
+			<site name="corner2upright" pos="0.01 0 0.032" size="0.0001"/>
+
+			<site name="corner2down" pos="0 0 -0.032" size="0.0001"/>
+			<site name="corner2downleft" pos="-0.01 0 -0.032" size="0.0001"/>
+			<site name="corner2downright" pos="0.01 0 -0.032" size="0.0001"/>
+		</body>
+	</worldbody>
+
+	
+	<tendon>
+		<spatial name="tendon1" width="0.001" springlength="0.1" damping="10" rgba="255 0 0 0.55">
+			<site site="beginning2"/>
+			<site site="corner1upleft"/>
+			<site site="corner1up"/>
+			<site site="corner1upright"/>
+			<site site="corner2downleft"/>
+			<site site="corner2down"/>
+			<site site="corner2downright"/>
+			<site site="end1"/>
+		</spatial>
+	</tendon>
+
+	<tendon>
+		<spatial name="tendon2" width="0.001" springlength="0.1" damping="10" rgba="0 255 0 0.55">
+			<site site="beginning1"/>
+			<site site="corner1downleft"/>
+			<site site="corner1down"/>
+			<site site="corner1downright"/>
+			<site site="corner2upleft"/>
+			<site site="corner2up"/>
+			<site site="corner2upright"/>
+			<site site="end2"/>
+		</spatial>
+	</tendon>
+
+	
+	<actuator>
+		<position name="motor_R1" joint="jointR1"/>
+		<position name="motor_R2" joint="jointR2"/>
+	</actuator>
+
+	
+	<sensor>
+		<framepos objtype="body" objname="R1"/>
+		<framepos objtype="body" objname="R2"/>
+	</sensor>
+
+</mujoco>
