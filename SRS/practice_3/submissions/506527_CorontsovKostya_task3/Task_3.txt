@@ -1,0 +1,135 @@
+import mujoco
+import mujoco.viewer
+import time
+
+paused = False
+
+def key_callback(keycode):
+  if chr(keycode) == ' ':
+    global paused
+    paused = not paused
+
+
+m = mujoco.MjModel.from_xml_path('tir5.xml')
+d = mujoco.MjData(m)
+
+with mujoco.viewer.launch_passive(m, d, key_callback=key_callback) as viewer:
+  # Close the viewer automatically after 30 wall-seconds.
+  start = time.time()
+  while viewer.is_running():
+    step_start = time.time()
+
+    # mj_step can be replaced with code that also evaluates
+    # a policy and applies a control signal before stepping the physics.
+    if not paused:
+        mujoco.mj_step(m, d)
+
+        # Example modification of a viewer option: toggle contact points every two seconds.
+        with viewer.lock():
+            viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(d.time % 2)
+
+        # Pick up changes to the physics state, apply perturbations, update options from GUI.
+        viewer.sync()
+
+        # Rudimentary time keeping, will drift relative to wall clock.
+        time_until_next_step = m.opt.timestep - (time.time() - step_start)
+        if time_until_next_step > 0:
+            time.sleep(time_until_next_step)
+
+
+
+-----------------Файл tir5.xml--------------------
+
+<mujoco model="tendon">
+    <option timestep="1e-3"/>
+    <option gravity="0 0 -9.8"/>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="0.5 0.5 0.5" width="265" height="256"/>
+        <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.1 0.1" rgb2="0.6 0.6 0.6" width="300" height="300"/>
+        <material name="grid" texture="grid" texrepeat="10 10" reflectance="0.2"/>
+    </asset>
+
+    <default>
+
+        <default class="visual_cylinder">
+          <geom type="cylinder" fromto="0 .015 0 0 -.015 0" size=".018" rgba=".3 .9 .3 .4"/>
+        </default>
+
+        <default class="visual_cylinder2">
+          <geom type="cylinder" fromto="0 .015 0 0 -.015 0" size=".037" rgba=".3 .9 .3 .4"/>
+        </default>
+
+    </default>
+
+
+  <worldbody>
+    <light pos="0 0 1"/>
+
+      <light pos="0 0 10"/>
+      <geom type="plane" size="0.5 0.5 0.1" material="grid"/>
+
+     <body name="Mechanism" pos="0 0 0.50" euler="0 0 0">
+         <site name="sWallUp1" size="0.005" pos="0.01 0 0.025"/>
+         <site name="sWallDown1" size="0.005" pos="0.01 0 -0.025"/>
+         <geom name="Wall" type="box" pos="0 0 0" size="0.005 0.1 0.1" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+         <geom name="link OA" type="cylinder" pos="0.102 0 0" size="0.015 0.097" rgba="0.21 0.32 0.82 0.5" euler="0 90 0" contype="0"/>
+
+         <body name="AB" pos="0.199 0 0" euler="0 0 0" >
+             <site name="sWallUp2" size="0.005" pos="0 0 0.025"/>
+             <site name="sWallDown2" size="0.005" pos="0 0 -0.025"/>
+             <joint name="A" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0"/>
+             <geom name="g1" class="visual_cylinder"/>
+             <geom name="link AB" type="cylinder" pos="0.046 0 0" size="0.015 0.046" rgba="0.21 0.32 0.82 0.5" euler="0 90 0" contype="0"/>
+
+
+             <body name="BC" pos="0.092 0 0" euler="0 0 0" >
+                 <joint name="B" type="hinge" axis="0 -1 0" stiffness="0" springref="0" damping="0"/>
+                 <site name="sWallUp3" size="0.005" pos="0 0 0.042"/>
+                 <site name="sWallDown3" size="0.005" pos="0 0 -0.042"/>
+                 <geom name="g2" class="visual_cylinder2"/>
+                 <geom name="link BC" type="cylinder" pos="0.063 0 0" size="0.015 0.063" rgba="0.21 0.32 0.82 0.5" euler="0 90 0" contype="0"/>
+                 <geom name="End" type="box" pos="0.136 0 0" size="0.01 0.015 0.06" rgba="0.89 0.14 0.16 0.5" euler="0 0 0" contype="0"/>
+                 <site name="sWallUp4" size="0.005" pos="0.121 0 0.042"/>
+                 <site name="sWallDown4" size="0.005" pos="0.121 0 -0.042"/>
+            </body>
+         </body>
+
+     </body>
+
+     </worldbody>
+
+  <tendon>
+    <spatial limited="false" range="0 0.6" width="0.0025">
+      <site site="sWallUp1"/>
+      <site site="sWallUp2"/>
+    </spatial>
+
+      <spatial limited="false" range="0 0.6" width="0.0025">
+      <site site="sWallUp2"/>
+      <site site="sWallDown3"/>
+    </spatial>
+
+      <spatial limited="false" range="0 0.6" width="0.0025">
+      <site site="sWallDown3"/>
+      <site site="sWallDown4"/>
+    </spatial>
+
+    <spatial limited="false" range="0 0.6" width="0.0025">
+      <site site="sWallDown1"/>
+      <site site="sWallDown2"/>
+    </spatial>
+
+      <spatial limited="false" range="0 0.6" width="0.0025">
+      <site site="sWallDown2"/>
+      <site site="sWallUp3"/>
+    </spatial>
+
+      <spatial limited="false" range="0 0.6" width="0.0025">
+      <site site="sWallUp3"/>
+      <site site="sWallUp4"/>
+    </spatial>
+
+
+  </tendon>
+</mujoco>
