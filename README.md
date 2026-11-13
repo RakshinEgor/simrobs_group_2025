@@ -4,7 +4,7 @@ Welcome to the repository of two subjects taught at ITMO University for Robotics
 
 Instructor: Ivan Borisov, PhD, borisovii@itmo.ru 
 
-Assistant: Egor Rakshin, MSc, earakshin@itmo.ru
+Assistant: Egor Rakshin, PhD, earakshin@itmo.ru
 
 # DOMS: Design and Optimization of Mechatronic Systems
 
